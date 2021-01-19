@@ -1,20 +1,36 @@
 #include <GL/glew.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <stdio.h>
 #include "shader.h"
 #include "utils.h"
 
 uint32_t shader_create_program(const char* vert_path, const char* frag_path)
 {
+    int success;
+    char infoLog[512];
+
     file_info vertex_shader_source = read_entire_file(vert_path);
     uint32_t vertex_shader = glCreateShader(GL_VERTEX_SHADER);
     glShaderSource(vertex_shader, 1, &vertex_shader_source.content, 0);
     glCompileShader(vertex_shader);
+    glGetShaderiv(vertex_shader, GL_COMPILE_STATUS, &success);
+    if(!success)
+    {
+        glGetShaderInfoLog(vertex_shader, 512, NULL, infoLog);
+        printf("ERROR(vertex_shader):%s\n", infoLog);
+    };
 
     file_info fragment_shader_source = read_entire_file(frag_path);
     uint32_t fragment_shader = glCreateShader(GL_FRAGMENT_SHADER);
     glShaderSource(fragment_shader, 1, &fragment_shader_source.content, 0);
     glCompileShader(fragment_shader);
+    glGetShaderiv(fragment_shader, GL_COMPILE_STATUS, &success);
+    if(!success)
+    {
+        glGetShaderInfoLog(fragment_shader, 512, NULL, infoLog);
+        printf("ERROR(fragment_shader):%s\n", infoLog);
+    };
 
     free(vertex_shader_source.content);
     free(fragment_shader_source.content);
@@ -23,6 +39,12 @@ uint32_t shader_create_program(const char* vert_path, const char* frag_path)
     glAttachShader(shader_program, vertex_shader);
     glAttachShader(shader_program, fragment_shader);
     glLinkProgram(shader_program);
+    glGetProgramiv(shader_program, GL_LINK_STATUS, &success);
+    if(!success)
+    {
+        glGetShaderInfoLog(fragment_shader, 512, NULL, infoLog);
+        printf("ERROR(program_shader):%s\n", infoLog);
+    };
 
     glDeleteShader(vertex_shader);
     glDeleteShader(fragment_shader); 

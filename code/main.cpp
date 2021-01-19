@@ -90,28 +90,27 @@ int main(int argc, char* argv[])
     GameState game_state = {};
     SDL_Window* window = initialize_platform(&game_state);
     
+    //Shader setup
+    uint32_t shader_program = shader_create_program("./shaders/shader.vert", "./shaders/shader.frag");
+    shader_use_program(shader_program);
+    m4 p = perspective(60.0f, (float)WINDOW_WIDTH/(float)WINDOW_HEIGHT, 0.1f, 100.0f);
+    shader_set_m4(shader_program, "projection", p);
+    printf("Projection:\n");
+    m4_dump(p);
+    
     game_state.game_textures[TEXTURE_CUBE] = texture_create("./res/texture.bmp");
     game_state.game_textures[TEXTURE_BOX] = texture_create("./res/box.bmp");
-    
     game_state.game_meshes[MESH_CUBE] = mesh_create(cube_vert, sizeof(cube_vert), cube_tex, sizeof(cube_tex));
     
     Renderable ren_cube = renderable_create(MESH_CUBE, TEXTURE_BOX); 
     ren_cube.pos = new_v3(0, 0, 0);
     ren_cube.rotate = new_v3(0, 25, 0);
-    
-    Renderable ren_cube2 = renderable_create(MESH_CUBE, TEXTURE_CUBE); 
-    ren_cube2.pos = new_v3(2, 0, 0);
-    ren_cube2.scale= new_v3(0.5f, 0.5f, 0.5f);
-    ren_cube2.rotate = new_v3(0, 0, 0);
-
-    //Shader setup
-    uint32_t shader_program = shader_create_program("./shaders/shader.vert", "./shaders/shader.frag");
-    shader_use_program(shader_program);
-    
-    m4 p = perspective(60.0f, (float)WINDOW_WIDTH/(float)WINDOW_HEIGHT, 0.1f, 100.0f);
-    shader_set_m4(shader_program, "projection", p);
-    printf("Projection:\n");
-    m4_dump(p);
+    //Lighting Test
+    Renderable ren_light = renderable_create(MESH_CUBE, new_v3(1, 1, 1)); 
+    ren_light.pos = new_v3(2, 0.6, 0);
+    ren_light.scale= new_v3(0.25f, 0.25f, 0.25f);
+    ren_light.rotate = new_v3(0, 0, 0);
+    shader_set_v3(shader_program, "light_color", ren_light.color); 
 
     while(game_state.running)
     {
@@ -152,14 +151,14 @@ int main(int argc, char* argv[])
         camera_update(&game_state.camera, shader_program);
 
         renderable_update(&ren_cube); 
-        renderable_update(&ren_cube2); 
+        renderable_update(&ren_light); 
         
         //TODO(tomi):Create game_render function 
         glClearColor(0.1f, 0.1f, 0.2f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
        
         renderable_render(ren_cube, shader_program, &game_state);
-        renderable_render(ren_cube2, shader_program, &game_state);
+        renderable_render(ren_light, shader_program, &game_state);
         
         SDL_GL_SwapWindow(window);
     }

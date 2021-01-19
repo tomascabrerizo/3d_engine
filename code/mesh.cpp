@@ -10,7 +10,6 @@ Mesh mesh_create(float* vertices, uint32_t vertices_size, float* tex_coords, uin
     Mesh new_mesh = {};
     new_mesh.vertices_count = vertices_size / VERTEX_SIZE;
     new_mesh.tex_coords_count = tex_coords_size / TEX_COORD_SIZE;
-    printf("%d\n",new_mesh.vertices_count);
     
     uint32_t vbo, tbo;
     glGenVertexArrays(1, &new_mesh.vao);
