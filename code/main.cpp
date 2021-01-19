@@ -86,7 +86,7 @@ SDL_Window* initialize_platform(GameState* game_state)
 
 int main(int argc, char* argv[])
 {
-    //TODO(tomi):Create game_init function
+    //TODO(tomi):Create game_init function, this function can be upgrade a lot
     GameState game_state = {};
     SDL_Window* window = initialize_platform(&game_state);
     
