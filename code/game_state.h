@@ -32,7 +32,7 @@ struct GameState {
 
     bool running = true;
 
-    //TODO(tomi): Check the actual number of keys scancodes when libsdl.org works!
+    //TODO(tomi): Check the actual number of keys scancodes/keysym when libsdl.org works!
     //Keyboar input
     bool keys[1024];
     //Mouse 

@@ -20,6 +20,7 @@ void process_input(GameState* game_state)
     SDL_Event event;
     while(SDL_PollEvent(&event))
     {
+        //TODO(tomi):Use key simbols insted of scancodes
         switch(event.type)
         {
         case SDL_QUIT: {
