@@ -101,17 +101,18 @@ int main(int argc, char* argv[])
     
     game_state.game_textures[TEXTURE_CUBE] = texture_create("./res/texture.bmp");
     game_state.game_textures[TEXTURE_BOX] = texture_create("./res/box.bmp");
-    game_state.game_meshes[MESH_CUBE] = mesh_create(cube_vert, sizeof(cube_vert), cube_tex, sizeof(cube_tex));
+    game_state.game_meshes[MESH_CUBE] = mesh_create(cube_vert, sizeof(cube_vert), cube_tex, sizeof(cube_tex), cube_normal, sizeof(cube_normal));
     
     Renderable ren_cube = renderable_create(MESH_CUBE, TEXTURE_BOX); 
     ren_cube.pos = new_v3(0, 0, 0);
-    ren_cube.rotate = new_v3(0, 25, 0);
+    ren_cube.rotate = new_v3(0, 40, 0);
+    
     //Lighting Test
     Renderable ren_light = renderable_create(MESH_CUBE, new_v3(1, 1, 1)); 
-    ren_light.pos = new_v3(2, 0.6, 0);
+    ren_light.pos = new_v3(2, 0.8, 0);
     ren_light.scale= new_v3(0.25f, 0.25f, 0.25f);
-    ren_light.rotate = new_v3(0, 0, 0);
     shader_set_v3(shader_program, "light_color", ren_light.color); 
+    shader_set_v3(shader_program, "light_pos", ren_light.pos); 
 
     while(game_state.running)
     {
