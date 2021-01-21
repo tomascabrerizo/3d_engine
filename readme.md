@@ -1,1 +1,1 @@
-thanks [to https://learnopengl.com]
+thanks to: https://learnopengl.com

@@ -1,55 +1,23 @@
 #ifndef GAME_STATE_H
 #define GAME_STATE_H
 
+#include <SDL2/SDL.h>
 #include "math.h"
 #include "texture.h"
 #include "mesh.h"
 #include "camera.h"
 #include "material.h"
 #include "light.h"
+#include "utils.h"
+#include "renderable.h"
 
 const int WINDOW_WIDTH = 800;
 const int WINDOW_HEIGHT = 600;
 
-#define MAX_TEXTURE_COUT 32
-#define MAX_MATERIAL_COUNT 32
-#define MAX_MESHES_COUNT 32
-#define MAX_LIGHTS_COUNT 32
-
-//Game textures
-enum TextureIndex {
-    TEXTURE_EMPTY = 0,
-    TEXTURE_CUBE,
-    TEXTURE_BOX,
-    TEXTURE_WOODBOX,
-    TEXTURE_WOODBOX_SPECULAR,
-
-    TEXTURE_COUNT,
-};
-
-enum MeshesIndex {
-    MESH_EMPTY = 0,
-    MESH_CUBE,
-
-    MESH_COUNT
-};
-
-enum MaterialIndex{
-    MATERIAL_EMPTY= 0,
-    MATERIAL_TEST,
-
-    MATERIAL_COUNT,
-};
-
-enum LightIndex{
-    LIGHT_EMPTY= 0,
-    LIGHT_TEST,
-
-    LIGHT_COUNT,
-};
 
 struct GameState {
-
+    
+    SDL_Window* window;
     bool running = true;
 
     //TODO(tomi): Check the actual number of keys scancodes/keysym when libsdl.org works!
@@ -59,12 +27,17 @@ struct GameState {
     float mouse_offset_x = 0;
     float mouse_offset_y = 0;
     
+    uint32_t shader_program;
+
     Camera camera;
 
     Texture game_textures[MAX_TEXTURE_COUT];
     Material game_materials[MAX_MATERIAL_COUNT];
     Mesh game_meshes[MAX_MESHES_COUNT];
     Light game_lights[MAX_LIGHTS_COUNT];
+
+    Renderable ren_cube;
+    Renderable ren_light;
 
 };
 

@@ -1,6 +1,7 @@
 #include <GL/glew.h>
 #include <assert.h>
 #include "renderable.h"
+#include "game_state.h"
 #include "shader.h"
 
 Renderable renderable_create(MeshesIndex mesh_index, TextureIndex texture_index, TextureIndex texture_specular_index, MaterialIndex material_index)

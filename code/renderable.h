@@ -3,7 +3,9 @@
 
 #include <stdint.h>
 #include "math.h"
-#include "game_state.h"
+#include "utils.h"
+
+struct GameState;
 
 struct Renderable
 {

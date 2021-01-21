@@ -19,9 +19,8 @@ void camera_update(Camera* camera, uint32_t shader)
 
 void camera_set_direction(Camera* camera, float offset_x, float offset_y)
 {
-    float sen = 0.6f;
-    camera->yaw += offset_x * sen;
-    camera->pitch -= offset_y * sen;
+    camera->yaw += offset_x * camera->sensibility;
+    camera->pitch -= offset_y * camera->sensibility;
     if(camera->pitch > 89.0f)
         camera->pitch =  89.0f;
     if(camera->pitch < -89.0f)

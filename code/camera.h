@@ -12,6 +12,7 @@ struct Camera {
     v3 front = new_v3(0, 0, -1);
     v3 world_up = new_v3(0, 1, 0);
     float speed = 5;
+    float sensibility = 0.6f; 
 };
 
 Camera camera_create(v3 pos, v3 front, v3 w_up);
