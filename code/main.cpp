@@ -105,14 +105,14 @@ int main(int argc, char* argv[])
     
     Renderable ren_cube = renderable_create(MESH_CUBE, TEXTURE_BOX); 
     ren_cube.pos = new_v3(0, 0, 0);
-    ren_cube.rotate = new_v3(0, 40, 0);
+    ren_cube.scale = new_v3(3, 3, 3);
+    ren_cube.rotate = new_v3(0, 0, 0);
     
     //Lighting Test
     Renderable ren_light = renderable_create(MESH_CUBE, new_v3(1, 1, 1)); 
-    ren_light.pos = new_v3(2, 0.8, 0);
+    ren_light.pos = new_v3(0, 5, 0);
     ren_light.scale= new_v3(0.25f, 0.25f, 0.25f);
     shader_set_v3(shader_program, "light_color", ren_light.color); 
-    shader_set_v3(shader_program, "light_pos", ren_light.pos); 
 
     while(game_state.running)
     {
@@ -146,6 +146,17 @@ int main(int argc, char* argv[])
             camera_move_down(&game_state.camera, dt);
         }
       
+        //Specular light
+        shader_set_v3(shader_program, "view_pos", game_state.camera.pos);
+        //Lighting Rotating in circle
+        float r = 6;
+        static float angle = 0;
+        ren_light.pos.x = r * cosf(to_rad(angle));
+        ren_light.pos.z = r * sinf(to_rad(angle));
+        ren_light.pos.y = sinf(to_rad(angle*4));
+        angle = angle >= 360 ? 0 : angle + 0.3;
+        shader_set_v3(shader_program, "light_pos", ren_light.pos);
+    
         camera_set_direction(&game_state.camera, game_state.mouse_offset_x, game_state.mouse_offset_y);
         //TODO(tomi):See where to put this code so its makes more senses
         game_state.mouse_offset_x = 0;

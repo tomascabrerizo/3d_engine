@@ -37,33 +37,33 @@ void camera_set_direction(Camera* camera, float offset_x, float offset_y)
 void camera_move_forward(Camera* camera, float dt)
 {
     v3 camera_right = normalize(cross(camera->front, camera->world_up));
-    camera->pos += normalize(cross(camera->world_up, camera_right)) * dt;
+    camera->pos += normalize(cross(camera->world_up, camera_right)) * camera->speed  * dt;
 }
 
 void camera_move_backward(Camera* camera, float dt)
 {
     v3 camera_right = normalize(cross(camera->front, camera->world_up));
-    camera->pos += normalize(cross(camera_right, camera->world_up)) * dt;
+    camera->pos += normalize(cross(camera_right, camera->world_up)) * camera->speed * dt;
 }
 
 void camera_move_right(Camera* camera, float dt)
 {
     v3 camera_right = normalize(cross(camera->front, camera->world_up));
-    camera->pos += camera_right * dt;
+    camera->pos += camera_right * camera->speed * dt;
 }
 
 void camera_move_left(Camera* camera, float dt)
 {
     v3 camera_right = normalize(cross(camera->front, camera->world_up));
-    camera->pos -= camera_right * dt;
+    camera->pos -= camera_right * camera->speed * dt;
 }
 
 void camera_move_up(Camera* camera, float dt)
 {
-    camera->pos += camera->world_up * dt;
+    camera->pos += camera->world_up * camera->speed * dt;
 }
 
 void camera_move_down(Camera* camera, float dt)
 {
-    camera->pos -= camera->world_up * dt;
+    camera->pos -= camera->world_up * camera->speed * dt;
 }
