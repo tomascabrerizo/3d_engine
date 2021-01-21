@@ -102,17 +102,21 @@ int main(int argc, char* argv[])
     game_state.game_textures[TEXTURE_CUBE] = texture_create("./res/texture.bmp");
     game_state.game_textures[TEXTURE_BOX] = texture_create("./res/box.bmp");
     game_state.game_meshes[MESH_CUBE] = mesh_create(cube_vert, sizeof(cube_vert), cube_tex, sizeof(cube_tex), cube_normal, sizeof(cube_normal));
-    
-    Renderable ren_cube = renderable_create(MESH_CUBE, TEXTURE_BOX); 
+    game_state.game_materials[MATERIAL_TEST] = material_create(new_v3(0.3, 0.3, 0.3), new_v3(0.7, 0.7, 0.7), new_v3(1, 1, 1), 64.0f);
+    game_state.game_lights[LIGHT_TEST] = light_create({}, new_v3(0.2, 0.2, 0.2), new_v3(0.4, 0.4, 0.4), new_v3(1, 1, 1)); 
+    shader_set_light(shader_program, "light", game_state.game_lights[LIGHT_TEST]);
+
+    Renderable ren_cube = renderable_create(MESH_CUBE, TEXTURE_BOX, MATERIAL_TEST); 
     ren_cube.pos = new_v3(0, 0, 0);
     ren_cube.scale = new_v3(3, 3, 3);
     ren_cube.rotate = new_v3(0, 0, 0);
-    
     //Lighting Test
     Renderable ren_light = renderable_create(MESH_CUBE, new_v3(1, 1, 1)); 
     ren_light.pos = new_v3(0, 5, 0);
     ren_light.scale= new_v3(0.25f, 0.25f, 0.25f);
     shader_set_v3(shader_program, "light_color", ren_light.color); 
+    
+    shader_set_material(shader_program, "material", {});
 
     while(game_state.running)
     {
@@ -167,7 +171,7 @@ int main(int argc, char* argv[])
         renderable_update(&ren_light); 
         
         //TODO(tomi):Create game_render function 
-        glClearColor(0.1f, 0.1f, 0.2f, 1.0f);
+        glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
        
         renderable_render(ren_cube, shader_program, &game_state);

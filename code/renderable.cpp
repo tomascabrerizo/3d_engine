@@ -3,13 +3,14 @@
 #include "renderable.h"
 #include "shader.h"
 
-Renderable renderable_create(MeshesIndex mesh_index, TextureIndex texture_index)
+Renderable renderable_create(MeshesIndex mesh_index, TextureIndex texture_index, MaterialIndex material_index)
 {
     assert(mesh_index < MAX_MESHES_COUNT);
     assert(texture_index < MAX_MESHES_COUNT);
     Renderable res = {};
     res.mesh_index = mesh_index;
     res.texture_index = texture_index;
+    res.material_index = material_index;
     res.has_texture = true;
     return res;
 }
@@ -38,6 +39,7 @@ void renderable_render(const Renderable& ren, uint32_t shader, GameState* gs)
     shader_set_m4(shader, "model", ren.model);
     shader_set_bool(shader, "has_texture", ren.has_texture);
     shader_set_v3(shader, "ren_color", ren.color);
+    shader_set_material(shader, "material", gs->game_materials[ren.material_index]);
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, gs->game_textures[ren.texture_index].id);
     glBindVertexArray(gs->game_meshes[ren.mesh_index].vao);

@@ -1,7 +1,7 @@
 #include <GL/glew.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include <stdio.h>
+#include <string.h>
 #include "shader.h"
 #include "utils.h"
 
@@ -81,4 +81,39 @@ void shader_set_v3(uint32_t program, const char* name, v3 v)
 void shader_set_m4(uint32_t program, const char* name, m4 m)
 {
     glUniformMatrix4fv(glGetUniformLocation(program, name), 1, true, m.m[0]);
+}
+
+void shader_set_material(uint32_t program, const char* name, const Material& m)
+{
+    char u_name[256];
+    strcpy(u_name, name); 
+    strcat(u_name, ".ambient");
+    shader_set_v3(program, u_name, m.ambient);
+    strcpy(u_name, name); 
+    strcat(u_name, ".diffuse");
+    shader_set_v3(program, u_name, m.diffuse);
+    strcpy(u_name, name); 
+    strcat(u_name, ".specular");
+    shader_set_v3(program, u_name, m.specular);
+    strcpy(u_name, name); 
+    strcat(u_name, ".shininess");
+    shader_set_float(program, u_name, m.shininess);
+}
+
+void shader_set_light(uint32_t program, const char* name, const Light& l)
+{
+    char u_name[256];
+    strcpy(u_name, name); 
+    strcat(u_name, ".position");
+    shader_set_v3(program, u_name, l.position);
+    strcpy(u_name, name); 
+    strcat(u_name, ".ambient");
+    shader_set_v3(program, u_name, l.ambient);
+    strcpy(u_name, name); 
+    strcat(u_name, ".diffuse");
+    shader_set_v3(program, u_name, l.diffuse);
+    strcpy(u_name, name); 
+    strcat(u_name, ".specular");
+    shader_set_v3(program, u_name, l.specular);
+
 }

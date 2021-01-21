@@ -5,12 +5,16 @@
 #include "texture.h"
 #include "mesh.h"
 #include "camera.h"
+#include "material.h"
+#include "light.h"
 
 const int WINDOW_WIDTH = 800;
 const int WINDOW_HEIGHT = 600;
 
-#define MAX_TEXTURE_COUT 256
+#define MAX_TEXTURE_COUT 32
+#define MAX_MATERIAL_COUNT 32
 #define MAX_MESHES_COUNT 32
+#define MAX_LIGHTS_COUNT 32
 
 //Game textures
 enum TextureIndex {
@@ -28,6 +32,20 @@ enum MeshesIndex {
     MESH_COUNT
 };
 
+enum MaterialIndex{
+    MATERIAL_EMPTY= 0,
+    MATERIAL_TEST,
+
+    MATERIAL_COUNT,
+};
+
+enum LightIndex{
+    LIGHT_EMPTY= 0,
+    LIGHT_TEST,
+
+    LIGHT_COUNT,
+};
+
 struct GameState {
 
     bool running = true;
@@ -42,7 +60,9 @@ struct GameState {
     Camera camera;
 
     Texture game_textures[MAX_TEXTURE_COUT];
+    Material game_materials[MAX_MATERIAL_COUNT];
     Mesh game_meshes[MAX_MESHES_COUNT];
+    Light game_lights[MAX_LIGHTS_COUNT];
 
 };
 
