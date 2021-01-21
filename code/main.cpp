@@ -115,8 +115,6 @@ void init_game_state(GameState* game_state)
 
 void game_init(GameState* game_state)
 {
-    init_game_state(game_state);
-     
     shader_set_light(game_state->shader_program, "light", game_state->game_lights[LIGHT_TEST]);
 
     game_state->ren_cube = renderable_create(MESH_CUBE, TEXTURE_WOODBOX, TEXTURE_WOODBOX_SPECULAR, MATERIAL_TEST); 
@@ -167,12 +165,12 @@ void game_update(GameState* game_state, float dt)
     //Specular light
     shader_set_v3(game_state->shader_program, "view_pos", game_state->camera.pos);
     //Lighting Rotating in circle
-    //float r = 6;
-    //static float angle = 0;
-    //game_state->ren_light.pos.x = r * cosf(to_rad(angle));
-    //game_state->ren_light.pos.z = r * sinf(to_rad(angle));
-    //game_state->ren_light.pos.y = sinf(to_rad(angle*4));
-    //angle = angle >= 360 ? 0 : angle + 10 * dt;
+    float r = 6;
+    static float angle = 0;
+    game_state->ren_light.pos.x = r * cosf(to_rad(angle));
+    game_state->ren_light.pos.z = r * sinf(to_rad(angle));
+    game_state->ren_light.pos.y = sinf(to_rad(angle*4));
+    angle = angle >= 360 ? 0 : angle + 10 * dt;
     shader_set_v3(game_state->shader_program, "light.position", game_state->ren_light.pos);
 
     camera_set_direction(&game_state->camera, game_state->mouse_offset_x, game_state->mouse_offset_y);
@@ -200,6 +198,7 @@ int main(int argc, char* argv[])
 {
         
     GameState game_state = {};
+    init_game_state(&game_state);
     game_init(&game_state);
 
     uint32_t last_time = 0;
