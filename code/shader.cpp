@@ -85,35 +85,17 @@ void shader_set_m4(uint32_t program, const char* name, m4 m)
 
 void shader_set_material(uint32_t program, const char* name, const Material& m)
 {
-    char u_name[256];
-    strcpy(u_name, name); 
-    strcat(u_name, ".ambient");
-    shader_set_v3(program, u_name, m.ambient);
-    strcpy(u_name, name); 
-    strcat(u_name, ".diffuse");
-    shader_set_v3(program, u_name, m.diffuse);
-    strcpy(u_name, name); 
-    strcat(u_name, ".specular");
-    shader_set_v3(program, u_name, m.specular);
-    strcpy(u_name, name); 
-    strcat(u_name, ".shininess");
-    shader_set_float(program, u_name, m.shininess);
+    char s[256];
+    shader_set_v3(program, concat_string(name, ".ambient", s), m.ambient);
+    //shader_set_v3(program, concat_string(name, ".diffuse", s), m.diffuse);
+    shader_set_v3(program, concat_string(name, ".specular", s), m.specular);
+    shader_set_float(program, concat_string(name, ".shininess", s), m.shininess);
 }
 
 void shader_set_light(uint32_t program, const char* name, const Light& l)
 {
-    char u_name[256];
-    strcpy(u_name, name); 
-    strcat(u_name, ".position");
-    shader_set_v3(program, u_name, l.position);
-    strcpy(u_name, name); 
-    strcat(u_name, ".ambient");
-    shader_set_v3(program, u_name, l.ambient);
-    strcpy(u_name, name); 
-    strcat(u_name, ".diffuse");
-    shader_set_v3(program, u_name, l.diffuse);
-    strcpy(u_name, name); 
-    strcat(u_name, ".specular");
-    shader_set_v3(program, u_name, l.specular);
-
+    char s[256];
+    shader_set_v3(program, concat_string(name, ".ambient", s), l.ambient);
+    shader_set_v3(program, concat_string(name, ".diffuse", s), l.diffuse);
+    shader_set_v3(program, concat_string(name, ".specular", s),l.specular);
 }

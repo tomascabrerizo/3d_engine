@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 #include "utils.h"
 
 file_info read_entire_file(const char* path)
@@ -24,4 +25,11 @@ file_info read_entire_file(const char* path)
     result.content = content;
     result.size = size;
     return result;
+}
+
+char* concat_string(const char* s0, const char* s1, char* s)
+{
+    strcpy(s, s0); 
+    strcat(s, s1);
+    return s;
 }

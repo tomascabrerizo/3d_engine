@@ -9,6 +9,7 @@ struct Renderable
 {
     uint32_t mesh_index;
     uint32_t texture_index;
+    uint32_t texture_specular_index;
     uint32_t material_index;
     
     v3 color;
@@ -21,7 +22,7 @@ struct Renderable
 };
 
 Renderable renderable_create(MeshesIndex mesh_index, v3 color);
-Renderable renderable_create(MeshesIndex mesh_index, TextureIndex texture_index, MaterialIndex material_index);
+Renderable renderable_create(MeshesIndex mesh_index, TextureIndex texture_index, TextureIndex texture_specular_index, MaterialIndex material_index);
 void renderable_update(Renderable* ren);
 void renderable_render(const Renderable& ren, uint32_t shader, GameState* gs);
 

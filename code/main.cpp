@@ -99,24 +99,34 @@ int main(int argc, char* argv[])
     printf("Projection:\n");
     m4_dump(p);
     
+    //Init textures
     game_state.game_textures[TEXTURE_CUBE] = texture_create("./res/texture.bmp");
     game_state.game_textures[TEXTURE_BOX] = texture_create("./res/box.bmp");
+    game_state.game_textures[TEXTURE_WOODBOX] = texture_create("./res/woodbox.bmp");
+    game_state.game_textures[TEXTURE_WOODBOX_SPECULAR] = texture_create("./res/woodbox_specular.bmp");
+    //Init meshes 
     game_state.game_meshes[MESH_CUBE] = mesh_create(cube_vert, sizeof(cube_vert), cube_tex, sizeof(cube_tex), cube_normal, sizeof(cube_normal));
-    game_state.game_materials[MATERIAL_TEST] = material_create(new_v3(0.3, 0.3, 0.3), new_v3(0.7, 0.7, 0.7), new_v3(1, 1, 1), 64.0f);
-    game_state.game_lights[LIGHT_TEST] = light_create({}, new_v3(0.2, 0.2, 0.2), new_v3(0.4, 0.4, 0.4), new_v3(1, 1, 1)); 
+    //Init materials 
+    game_state.game_materials[MATERIAL_TEST] = material_create(new_v3(0.2, 0.2, 0.2), new_v3(1, 1, 1), 64.0f);
+    //Init light 
+    game_state.game_lights[LIGHT_TEST] = light_create(new_v3(0.3, 0.3, 0.3), new_v3(0.7, 0.7, 0.7), new_v3(1, 1, 1)); 
+    
     shader_set_light(shader_program, "light", game_state.game_lights[LIGHT_TEST]);
 
-    Renderable ren_cube = renderable_create(MESH_CUBE, TEXTURE_BOX, MATERIAL_TEST); 
+    Renderable ren_cube = renderable_create(MESH_CUBE, TEXTURE_WOODBOX, TEXTURE_WOODBOX_SPECULAR, MATERIAL_TEST); 
     ren_cube.pos = new_v3(0, 0, 0);
     ren_cube.scale = new_v3(3, 3, 3);
     ren_cube.rotate = new_v3(0, 0, 0);
     //Lighting Test
     Renderable ren_light = renderable_create(MESH_CUBE, new_v3(1, 1, 1)); 
-    ren_light.pos = new_v3(0, 5, 0);
+    ren_light.pos = new_v3(3, 1.7, 4.3);
     ren_light.scale= new_v3(0.25f, 0.25f, 0.25f);
-    shader_set_v3(shader_program, "light_color", ren_light.color); 
     
     shader_set_material(shader_program, "material", {});
+    shader_set_int(shader_program, "material.diffuse", 0);
+    shader_set_int(shader_program, "material.specular", 1);
+        
+    shader_set_v3(shader_program, "light.position", ren_light.pos);
 
     while(game_state.running)
     {
@@ -153,13 +163,12 @@ int main(int argc, char* argv[])
         //Specular light
         shader_set_v3(shader_program, "view_pos", game_state.camera.pos);
         //Lighting Rotating in circle
-        float r = 6;
-        static float angle = 0;
-        ren_light.pos.x = r * cosf(to_rad(angle));
-        ren_light.pos.z = r * sinf(to_rad(angle));
-        ren_light.pos.y = sinf(to_rad(angle*4));
-        angle = angle >= 360 ? 0 : angle + 0.3;
-        shader_set_v3(shader_program, "light_pos", ren_light.pos);
+        //float r = 6;
+        //static float angle = 0;
+        //ren_light.pos.x = r * cosf(to_rad(angle));
+        //ren_light.pos.z = r * sinf(to_rad(angle));
+        //ren_light.pos.y = sinf(to_rad(angle*4));
+        //angle = angle >= 360 ? 0 : angle + 0.3;
     
         camera_set_direction(&game_state.camera, game_state.mouse_offset_x, game_state.mouse_offset_y);
         //TODO(tomi):See where to put this code so its makes more senses
