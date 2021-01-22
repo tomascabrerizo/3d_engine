@@ -9,11 +9,11 @@
 #include "material.h"
 #include "light.h"
 #include "utils.h"
+#include "defines.h"
 #include "renderable.h"
 
 const int WINDOW_WIDTH = 800;
 const int WINDOW_HEIGHT = 600;
-
 
 struct GameState {
     

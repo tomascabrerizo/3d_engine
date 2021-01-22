@@ -4,6 +4,7 @@
 #include <stdint.h>
 #include "math.h"
 #include "utils.h"
+#include "defines.h"
 
 struct GameState;
 

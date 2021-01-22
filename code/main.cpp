@@ -7,6 +7,7 @@
 #include "math.h"
 #include "cube.h"
 #include "game_state.h"
+#include "renderable.h"
 
 #define internal static
 #define global static
@@ -165,12 +166,12 @@ void game_update(GameState* game_state, float dt)
     //Specular light
     shader_set_v3(game_state->shader_program, "view_pos", game_state->camera.pos);
     //Lighting Rotating in circle
-    float r = 6;
-    static float angle = 0;
-    game_state->ren_light.pos.x = r * cosf(to_rad(angle));
-    game_state->ren_light.pos.z = r * sinf(to_rad(angle));
-    game_state->ren_light.pos.y = sinf(to_rad(angle*4));
-    angle = angle >= 360 ? 0 : angle + 10 * dt;
+    //float r = 6;
+    //static float angle = 0;
+    //game_state->ren_light.pos.x = r * cosf(to_rad(angle));
+    //game_state->ren_light.pos.z = r * sinf(to_rad(angle));
+    //game_state->ren_light.pos.y = sinf(to_rad(angle*4));
+    //angle = angle >= 360 ? 0 : angle + 10 * dt;
     shader_set_v3(game_state->shader_program, "light.position", game_state->ren_light.pos);
 
     camera_set_direction(&game_state->camera, game_state->mouse_offset_x, game_state->mouse_offset_y);

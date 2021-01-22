@@ -8,6 +8,7 @@ Renderable renderable_create(MeshesIndex mesh_index, TextureIndex texture_index,
 {
     assert(mesh_index < MAX_MESHES_COUNT);
     assert(texture_index < MAX_MESHES_COUNT);
+    assert(texture_specular_index < MAX_MESHES_COUNT);
     Renderable res = {};
     res.mesh_index = mesh_index;
     res.texture_index = texture_index;
