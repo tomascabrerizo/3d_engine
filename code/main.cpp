@@ -107,9 +107,9 @@ void init_game_state(GameState* game_state)
     game_state->game_materials[MATERIAL_TEST].shininess = 64;
    
     //Init light 
-    game_state->game_lights[LIGHT_TEST].ambient = new_v3(0.1, 0.1, 0.1);
-    game_state->game_lights[LIGHT_TEST].diffuse = new_v3(0.8, 0.8, 0.8);
-    game_state->game_lights[LIGHT_TEST].specular = new_v3(1, 1, 1); 
+    game_state->game_lights[LIGHT_TEST].ambient = new_v3(0.2, 0.2, 0.2);
+    game_state->game_lights[LIGHT_TEST].diffuse = new_v3(0.8, 0.8, 0.7);
+    game_state->game_lights[LIGHT_TEST].specular = new_v3(1, 1, 0.9); 
 
 }
 
@@ -122,7 +122,7 @@ void game_init(GameState* game_state)
     game_state->ren_cube.scale = new_v3(3, 3, 3);
     game_state->ren_cube.rotate = new_v3(0, 0, 0);
     //Lighting Test
-    game_state->ren_light = renderable_create(MESH_CUBE, new_v3(1, 1, 1)); 
+    game_state->ren_light = renderable_create(MESH_CUBE, new_v3(1, 1, 0.8)); 
     game_state->ren_light.pos = new_v3(3, 2.3, 4.3);
     game_state->ren_light.scale = new_v3(0.25f, 0.25f, 0.25f);
     
