@@ -92,9 +92,9 @@ void shader_set_material(uint32_t program, const char* name, const Material& m)
 {
     shader_use_program(program);
     char s[256];
-    shader_set_v3(program, concat_string(name, ".ambient", s), m.ambient);
+    //shader_set_v3(program, concat_string(name, ".ambient", s), m.ambient);
     //shader_set_v3(program, concat_string(name, ".diffuse", s), m.diffuse);
-    shader_set_v3(program, concat_string(name, ".specular", s), m.specular);
+    //shader_set_v3(program, concat_string(name, ".specular", s), m.specular);
     shader_set_float(program, concat_string(name, ".shininess", s), m.shininess);
 }
 

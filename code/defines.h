@@ -4,7 +4,7 @@
 #define MAX_TEXTURE_COUT 32
 #define MAX_MATERIAL_COUNT 32
 #define MAX_MESHES_COUNT 32
-#define MAX_POINT_LIGHTS 3
+#define MAX_POINT_LIGHTS 4
 
 //Game textures
 enum TextureIndex {

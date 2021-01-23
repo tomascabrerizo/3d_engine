@@ -12,7 +12,6 @@
 #define internal static
 #define global static
 
-
 internal 
 void process_input(GameState* game_state)
 {
@@ -109,14 +108,14 @@ void game_init(GameState* game_state)
             cube_normal, sizeof(cube_normal));
    
     //Init materials 
-    game_state->game_materials[MATERIAL_TEST].shininess = 32;
+    game_state->game_materials[MATERIAL_TEST] = material_create(TEXTURE_WOODBOX, TEXTURE_WOODBOX_SPECULAR, 32);
     shader_set_int(game_state->shader_program, "material.diffuse", 0);
     shader_set_int(game_state->shader_program, "material.specular", 1);
    
     //Init light 
     game_state->dir_light.direction = new_v3(-0.2f, -1.0f, -0.3f);
-    game_state->dir_light.ambient = new_v3(0.02f, 0.02f, 0.02f);
-    game_state->dir_light.diffuse = new_v3(0.4f, 0.4f, 0.4f);
+    game_state->dir_light.ambient = new_v3(0.1f, 0.1f, 0.1f);
+    game_state->dir_light.diffuse = new_v3(0.2f, 0.2f, 0.2f);
     game_state->dir_light.specular = new_v3(0.5f, 0.5f, 0.5f);
     
     v3 pointLightPositions[] = {
@@ -133,15 +132,15 @@ void game_init(GameState* game_state)
         game_state->point_lights[i].diffuse = new_v3(0.8f, (0.8f), 0.8f);
         game_state->point_lights[i].specular = new_v3(1.0f, 1.0f, 1.0f);
         game_state->point_lights[i].constant = 1.0f;
-        game_state->point_lights[i].linear = 0.09f; 
-        game_state->point_lights[i].quadratic = 0.032f; 
+        game_state->point_lights[i].linear = 0.22f; 
+        game_state->point_lights[i].quadratic = 0.20f; 
     }
     
     //Init Ren_Cubes
     for(uint32_t i = 0; i < array_count(cubePositions); ++i)
     {
         float angle = 20 * i;
-        game_state->ren_cubes[i] = renderable_create(MESH_CUBE, TEXTURE_WOODBOX, TEXTURE_WOODBOX_SPECULAR, MATERIAL_TEST); 
+        game_state->ren_cubes[i] = renderable_create(MESH_CUBE, MATERIAL_TEST); 
         game_state->ren_cubes[i].pos = cubePositions[i];
         game_state->ren_cubes[i].scale = new_v3(1, 1, 1);
         game_state->ren_cubes[i].rotate = new_v3(angle, angle*3, angle*5);
@@ -238,7 +237,6 @@ void game_render(GameState* game_state)
 
 int main(int argc, char* argv[])
 {
-        
     GameState game_state = {};
     game_init(&game_state);
 
