@@ -28,16 +28,19 @@ struct GameState {
     float mouse_offset_y = 0;
     
     uint32_t shader_program;
+    uint32_t shader_program2;
 
     Camera camera;
 
     Texture game_textures[MAX_TEXTURE_COUT];
     Material game_materials[MAX_MATERIAL_COUNT];
     Mesh game_meshes[MAX_MESHES_COUNT];
-    Light game_lights[MAX_LIGHTS_COUNT];
 
-    Renderable ren_cube;
-    Renderable ren_light;
+    DirLight dir_light;
+    PointLight point_lights[MAX_POINT_LIGHTS];
+
+    Renderable ren_cubes[10];
+    Renderable ren_lights[MAX_POINT_LIGHTS];
 
 };
 

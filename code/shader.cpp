@@ -59,32 +59,38 @@ void shader_use_program(uint32_t program)
 
 void shader_set_bool(uint32_t program, const char* name, bool value)
 {
+    shader_use_program(program);
     glUniform1i(glGetUniformLocation(program, name), (int)value);
 }
 
 void shader_set_int(uint32_t program, const char* name, int value)
 {
+    shader_use_program(program);
     glUniform1i(glGetUniformLocation(program, name), value);
 }
 
 
 void shader_set_float(uint32_t program, const char* name, float value)
 {
+    shader_use_program(program);
     glUniform1f(glGetUniformLocation(program, name), value);
 }
 
 void shader_set_v3(uint32_t program, const char* name, v3 v)
 {
+    shader_use_program(program);
     glUniform3f(glGetUniformLocation(program, name), v.x, v.y, v.z);
 }
 
 void shader_set_m4(uint32_t program, const char* name, m4 m)
 {
+    shader_use_program(program);
     glUniformMatrix4fv(glGetUniformLocation(program, name), 1, true, m.m[0]);
 }
 
 void shader_set_material(uint32_t program, const char* name, const Material& m)
 {
+    shader_use_program(program);
     char s[256];
     shader_set_v3(program, concat_string(name, ".ambient", s), m.ambient);
     //shader_set_v3(program, concat_string(name, ".diffuse", s), m.diffuse);
@@ -92,9 +98,26 @@ void shader_set_material(uint32_t program, const char* name, const Material& m)
     shader_set_float(program, concat_string(name, ".shininess", s), m.shininess);
 }
 
-void shader_set_light(uint32_t program, const char* name, const Light& l)
+void shader_set_point_light(uint32_t program, const char* name, const PointLight& l)
 {
+    shader_use_program(program);
     char s[256];
+    shader_set_v3(program, concat_string(name, ".position", s), l.position);
+
+    shader_set_float(program, concat_string(name, ".constant", s), l.constant);
+    shader_set_float(program, concat_string(name, ".linear", s), l.linear);
+    shader_set_float(program, concat_string(name, ".quadratic", s), l.quadratic);
+    
+    shader_set_v3(program, concat_string(name, ".ambient", s), l.ambient);
+    shader_set_v3(program, concat_string(name, ".diffuse", s), l.diffuse);
+    shader_set_v3(program, concat_string(name, ".specular", s),l.specular);
+}
+
+void shader_set_dir_light(uint32_t program, const char* name, const DirLight& l)
+{
+    shader_use_program(program);
+    char s[256];
+    shader_set_v3(program, concat_string(name, ".direction", s), l.direction);
     shader_set_v3(program, concat_string(name, ".ambient", s), l.ambient);
     shader_set_v3(program, concat_string(name, ".diffuse", s), l.diffuse);
     shader_set_v3(program, concat_string(name, ".specular", s),l.specular);

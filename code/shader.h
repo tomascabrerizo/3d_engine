@@ -14,6 +14,7 @@ void shader_set_float(uint32_t program, const char* name, float value);
 void shader_set_m4(uint32_t program, const char* name, m4 m);
 void shader_set_v3(uint32_t program, const char* name, v3 v);
 void shader_set_material(uint32_t program, const char* name, const Material& m);
-void shader_set_light(uint32_t program, const char* name, const Light& l);
+void shader_set_dir_light(uint32_t program, const char* name, const DirLight& l);
+void shader_set_point_light(uint32_t program, const char* name, const PointLight& l);
 
 #endif

@@ -12,6 +12,7 @@
 #define internal static
 #define global static
 
+
 internal 
 void process_input(GameState* game_state)
 {
@@ -83,14 +84,17 @@ SDL_Window* initialize_platform(GameState* game_state)
     return window; 
 }
 
-void init_game_state(GameState* game_state)
+void game_init(GameState* game_state)
 {
     game_state->window = initialize_platform(game_state);
+    //IMPORTANT TODO(tomi)Make differents types of shaders for the game
     //Shader setup
-    game_state->shader_program = shader_create_program("./shaders/shader.vert", "./shaders/shader.frag");
-    shader_use_program(game_state->shader_program);
+    game_state->shader_program = shader_create_program("./shaders/shader.vert", "./shaders/shader_light.frag");
+    game_state->shader_program2 = shader_create_program("./shaders/shader.vert", "./shaders/shader_light_src.frag");
+    
     m4 p = perspective(60.0f, (float)WINDOW_WIDTH/(float)WINDOW_HEIGHT, 0.1f, 100.0f);
     shader_set_m4(game_state->shader_program, "projection", p);
+    shader_set_m4(game_state->shader_program2, "projection", p);
     
     //Init textures
     game_state->game_textures[TEXTURE_CUBE] = texture_create("./res/texture.bmp");
@@ -105,34 +109,56 @@ void init_game_state(GameState* game_state)
             cube_normal, sizeof(cube_normal));
    
     //Init materials 
-    game_state->game_materials[MATERIAL_TEST].shininess = 64;
-   
-    //Init light 
-    game_state->game_lights[LIGHT_TEST].ambient = new_v3(0.2, 0.2, 0.2);
-    game_state->game_lights[LIGHT_TEST].diffuse = new_v3(0.8, 0.8, 0.7);
-    game_state->game_lights[LIGHT_TEST].specular = new_v3(1, 1, 0.9); 
-
-}
-
-void game_init(GameState* game_state)
-{
-    shader_set_light(game_state->shader_program, "light", game_state->game_lights[LIGHT_TEST]);
-
-    game_state->ren_cube = renderable_create(MESH_CUBE, TEXTURE_WOODBOX, TEXTURE_WOODBOX_SPECULAR, MATERIAL_TEST); 
-    game_state->ren_cube.pos = new_v3(0, 0, 0);
-    game_state->ren_cube.scale = new_v3(3, 3, 3);
-    game_state->ren_cube.rotate = new_v3(0, 0, 0);
-    //Lighting Test
-    game_state->ren_light = renderable_create(MESH_CUBE, new_v3(1, 1, 0.8)); 
-    game_state->ren_light.pos = new_v3(3, 2.3, 4.3);
-    game_state->ren_light.scale = new_v3(0.25f, 0.25f, 0.25f);
-    
+    game_state->game_materials[MATERIAL_TEST].shininess = 32;
     shader_set_int(game_state->shader_program, "material.diffuse", 0);
     shader_set_int(game_state->shader_program, "material.specular", 1);
+   
+    //Init light 
+    game_state->dir_light.direction = new_v3(-0.2f, -1.0f, -0.3f);
+    game_state->dir_light.ambient = new_v3(0.02f, 0.02f, 0.02f);
+    game_state->dir_light.diffuse = new_v3(0.4f, 0.4f, 0.4f);
+    game_state->dir_light.specular = new_v3(0.5f, 0.5f, 0.5f);
+    
+    v3 pointLightPositions[] = {
+        new_v3( 0.7f,  0.2f,  2.0f),
+        new_v3( 2.3f, -3.3f, -4.0f),
+        new_v3(-4.0f,  2.0f, -12.0f),
+        new_v3( 0.0f,  0.0f, -3.0f)
+    };
 
+    for(uint32_t i = 0; i < MAX_POINT_LIGHTS; ++i)
+    {
+        game_state->point_lights[i].position = pointLightPositions[i];
+        game_state->point_lights[i].ambient = new_v3(0.05f, 0.05f, 0.05f);
+        game_state->point_lights[i].diffuse = new_v3(0.8f, (0.8f), 0.8f);
+        game_state->point_lights[i].specular = new_v3(1.0f, 1.0f, 1.0f);
+        game_state->point_lights[i].constant = 1.0f;
+        game_state->point_lights[i].linear = 0.09f; 
+        game_state->point_lights[i].quadratic = 0.032f; 
+    }
+    
+    //Init Ren_Cubes
+    for(uint32_t i = 0; i < array_count(cubePositions); ++i)
+    {
+        float angle = 20 * i;
+        game_state->ren_cubes[i] = renderable_create(MESH_CUBE, TEXTURE_WOODBOX, TEXTURE_WOODBOX_SPECULAR, MATERIAL_TEST); 
+        game_state->ren_cubes[i].pos = cubePositions[i];
+        game_state->ren_cubes[i].scale = new_v3(1, 1, 1);
+        game_state->ren_cubes[i].rotate = new_v3(angle, angle*3, angle*5);
+    }
+
+    //Init Ren_Light
+    for(uint32_t i = 0; i < MAX_POINT_LIGHTS; ++i)
+    {
+        game_state->ren_lights[i] = renderable_create(MESH_CUBE, new_v3(1, 1, 1));
+        game_state->ren_lights[i].scale = new_v3(0.3, 0.3, 0.3);
+        game_state->ren_lights[i].pos = pointLightPositions[i]; 
+    } 
+    
     //Init camera
     game_state->camera.speed = 3;
     game_state->camera.sensibility = 0.5f;
+
 }
 
 void game_update(GameState* game_state, float dt)
@@ -163,25 +189,34 @@ void game_update(GameState* game_state, float dt)
         camera_move_down(&game_state->camera, dt);
     }
   
-    //Specular light
     shader_set_v3(game_state->shader_program, "view_pos", game_state->camera.pos);
-    //Lighting Rotating in circle
-    //float r = 6;
-    //static float angle = 0;
-    //game_state->ren_light.pos.x = r * cosf(to_rad(angle));
-    //game_state->ren_light.pos.z = r * sinf(to_rad(angle));
-    //game_state->ren_light.pos.y = sinf(to_rad(angle*4));
-    //angle = angle >= 360 ? 0 : angle + 10 * dt;
-    shader_set_v3(game_state->shader_program, "light.position", game_state->ren_light.pos);
-
+    shader_set_v3(game_state->shader_program2, "view_pos", game_state->camera.pos);
+    
     camera_set_direction(&game_state->camera, game_state->mouse_offset_x, game_state->mouse_offset_y);
-    //TODO(tomi):See where to put this code so its makes more senses
     game_state->mouse_offset_x = 0;
     game_state->mouse_offset_y = 0;
     camera_update(&game_state->camera, game_state->shader_program);
+    camera_update(&game_state->camera, game_state->shader_program2);
+    
+    //Update light uniforms
+    shader_set_int(game_state->shader_program, "NR_POINT_LIGHTS", (int)MAX_POINT_LIGHTS);
+    shader_set_dir_light(game_state->shader_program, "dir_light", game_state->dir_light);
+    for(uint32_t i = 0; i < MAX_POINT_LIGHTS; ++i)
+    {
+        char buffer[64];
+        sprintf(buffer, "point_lights[%d]", i);
+        shader_set_point_light(game_state->shader_program, buffer, game_state->point_lights[i]);
+    }
 
-    renderable_update(&game_state->ren_cube); 
-    renderable_update(&game_state->ren_light); 
+    for(uint32_t i = 0; i < array_count(cubePositions); ++i)
+    {
+        renderable_update(&game_state->ren_cubes[i]);
+    }
+    
+    for(uint32_t i = 0; i < MAX_POINT_LIGHTS; ++i)
+    {
+        renderable_update(&game_state->ren_lights[i]);
+    } 
 }
 
 void game_render(GameState* game_state)
@@ -189,9 +224,15 @@ void game_render(GameState* game_state)
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
    
-    renderable_render(game_state->ren_cube, game_state->shader_program, game_state);
-    renderable_render(game_state->ren_light, game_state->shader_program, game_state);
-    
+    for(uint32_t i = 0; i < array_count(cubePositions); ++i)
+    {
+        renderable_render(game_state->ren_cubes[i], game_state->shader_program, game_state);
+    }
+    for(uint32_t i = 0; i < MAX_POINT_LIGHTS; ++i)
+    {
+        renderable_render(game_state->ren_lights[i], game_state->shader_program2, game_state);
+    } 
+
     SDL_GL_SwapWindow(game_state->window);
 }
 
@@ -199,7 +240,6 @@ int main(int argc, char* argv[])
 {
         
     GameState game_state = {};
-    init_game_state(&game_state);
     game_init(&game_state);
 
     uint32_t last_time = 0;

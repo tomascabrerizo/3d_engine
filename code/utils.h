@@ -3,6 +3,8 @@
 
 #include <stdint.h>
 
+#define array_count(x) (sizeof(x)/sizeof(x[0]))
+
 typedef struct
 {
     char* content;
