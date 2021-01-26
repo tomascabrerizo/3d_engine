@@ -12,6 +12,14 @@
 #define internal static
 #define global static
 
+
+int main(int argc, char* argv[])
+{
+    parse_obj_file("./res/models/backpack/backpack.obj");
+    
+    return 0;
+}
+
 internal 
 void process_input(GameState* game_state)
 {
@@ -56,9 +64,7 @@ SDL_Window* initialize_platform(GameState* game_state)
 	    SDL_WINDOWPOS_UNDEFINED,
 	    WINDOW_WIDTH, WINDOW_HEIGHT,
 	    SDL_WINDOW_OPENGL
-	);
-
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+	);    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
     
@@ -86,7 +92,6 @@ SDL_Window* initialize_platform(GameState* game_state)
 void game_init(GameState* game_state)
 {
     game_state->window = initialize_platform(game_state);
-    //IMPORTANT TODO(tomi)Make differents types of shaders for the game
     //Shader setup
     game_state->shader_program = shader_create_program("./shaders/shader.vert", "./shaders/shader_light.frag");
     game_state->shader_program2 = shader_create_program("./shaders/shader.vert", "./shaders/shader_light_src.frag");
@@ -220,9 +225,10 @@ void game_update(GameState* game_state, float dt)
 
 void game_render(GameState* game_state)
 {
+    //TODO(tomi):Create a good renderer to render the differents vaos
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-   
+
     for(uint32_t i = 0; i < array_count(cubePositions); ++i)
     {
         renderable_render(game_state->ren_cubes[i], game_state->shader_program, game_state);
@@ -235,7 +241,7 @@ void game_render(GameState* game_state)
     SDL_GL_SwapWindow(game_state->window);
 }
 
-int main(int argc, char* argv[])
+int main_(int argc, char* argv[])
 {
     GameState game_state = {};
     game_init(&game_state);
