@@ -6,6 +6,10 @@ float to_rad(float a)
     return a*PI/180;
 }
 
+v2 new_v2(float x, float y)
+{
+    return {x, y};
+}
 
 v3 new_v3(float x, float y, float z)
 {

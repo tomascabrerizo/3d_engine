@@ -5,6 +5,13 @@
 
 #define PI 3.1415926f
 
+struct v2 {
+    float x;
+    float y;
+};
+
+v2 new_v2(float x, float y);
+
 struct v3 {
     float x;
     float y;

@@ -1,10 +1,16 @@
 #include <GL/glew.h>
-#include "mesh.h"
 #include <stdio.h>
+#include <stddef.h>
+#include "mesh.h"
 
 #define VERTEX_SIZE 12
 #define TEX_COORD_SIZE 8
 #define NORMAL_SIZE 12
+
+Vertex new_vertex(v3 position, v3 normal, v2 tex_coord)
+{
+    return {position, normal, tex_coord};
+}
 
 Mesh mesh_create(float* vertices, uint32_t vertices_size, float* tex_coords, uint32_t tex_coords_size, float* normals, uint32_t normals_size)
 {
@@ -35,5 +41,34 @@ Mesh mesh_create(float* vertices, uint32_t vertices_size, float* tex_coords, uin
     glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 3* sizeof(float), 0);
     glEnableVertexAttribArray(2);
     
+    return new_mesh;
+}
+
+Mesh mesh_create(std::vector<Vertex> vertices, std::vector<uint32_t> indices, std::vector<uint32_t> texture_index)
+{
+    Mesh new_mesh = {};
+    new_mesh.vertices = vertices;
+    new_mesh.indices = indices;
+    new_mesh.texture_index = texture_index; 
+
+    uint32_t vbo, ebo;
+    glGenVertexArrays(1, &new_mesh.vao);
+    glBindVertexArray(new_mesh.vao);
+
+    glGenBuffers(1, &vbo);
+    glBindBuffer(GL_ARRAY_BUFFER, vbo);
+    glBufferData(GL_ARRAY_BUFFER, vertices.size()*sizeof(Vertex), &vertices[0], GL_STATIC_DRAW);
+    
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, position));
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, normal));
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, tex_coord));
+    glEnableVertexAttribArray(2);
+    
+    glGenBuffers(1, &ebo);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size()*sizeof(uint32_t), &indices[0], GL_STATIC_DRAW);
+
     return new_mesh;
 }

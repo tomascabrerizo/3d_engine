@@ -10,8 +10,8 @@ Renderable renderable_create(MeshesIndex mesh_index, MaterialIndex material_inde
     assert(mesh_index < MAX_MESHES_COUNT);
     assert(material_index < MAX_MATERIAL_COUNT);
     Renderable res = {};
-    res.mesh_index = mesh_index;
-    res.material_index = material_index;
+    res.mesh_index[0] = mesh_index;
+    res.material_index[0] = material_index;
     res.has_texture = true;
     return res;
 }
@@ -20,7 +20,7 @@ Renderable renderable_create(MeshesIndex mesh_index, v3 color)
 {
     assert(mesh_index < MAX_MESHES_COUNT);
     Renderable res = {};
-    res.mesh_index = mesh_index;
+    res.mesh_index[0] = mesh_index;
     res.color = color;
     res.has_texture = false;
     return res;
@@ -42,7 +42,7 @@ void renderable_render(const Renderable& ren, uint32_t shader, GameState* gs)
     shader_set_m4(shader, "model", ren.model);
     if(ren.has_texture)
     {
-        Material material = gs->game_materials[ren.material_index];
+        Material material = gs->game_materials[ren.material_index[0]];
         shader_set_material(shader, "material", material);
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, gs->game_textures[material.texture_index].id);
@@ -53,6 +53,7 @@ void renderable_render(const Renderable& ren, uint32_t shader, GameState* gs)
     {
         shader_set_v3(shader, "ren_color", ren.color);
     }
-    glBindVertexArray(gs->game_meshes[ren.mesh_index].vao);
-    glDrawArrays(GL_TRIANGLES, 0, gs->game_meshes[ren.mesh_index].vertices_count);
+    glBindVertexArray(gs->game_meshes[ren.mesh_index[0]].vao);
+    glDrawArrays(GL_TRIANGLES, 0, gs->game_meshes[ren.mesh_index[0]].vertices_count);
+    //glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
 }

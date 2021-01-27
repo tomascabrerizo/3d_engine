@@ -8,7 +8,6 @@
 #include "camera.h"
 #include "material.h"
 #include "light.h"
-#include "utils.h"
 #include "defines.h"
 #include "renderable.h"
 
@@ -33,8 +32,14 @@ struct GameState {
     Camera camera;
 
     Texture game_textures[MAX_TEXTURE_COUT];
+    uint32_t last_texture_index = TEXTURE_COUNT - 1;
+
     Material game_materials[MAX_MATERIAL_COUNT];
+    uint32_t last_material_index = MATERIAL_COUNT - 1;
+    
     Mesh game_meshes[MAX_MESHES_COUNT];
+    uint32_t last_mesh_index = MESH_COUNT - 1;
+
 
     DirLight dir_light;
     PointLight point_lights[MAX_POINT_LIGHTS];

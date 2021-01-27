@@ -8,17 +8,11 @@
 #include "cube.h"
 #include "game_state.h"
 #include "renderable.h"
+#include "utils.h"
 
 #define internal static
 #define global static
 
-
-int main(int argc, char* argv[])
-{
-    parse_obj_file("./res/models/backpack/backpack.obj");
-    
-    return 0;
-}
 
 internal 
 void process_input(GameState* game_state)
@@ -239,6 +233,15 @@ void game_render(GameState* game_state)
     } 
 
     SDL_GL_SwapWindow(game_state->window);
+}
+
+int main(int argc, char* argv[])
+{
+    GameState game_state = {};
+    game_init(&game_state);
+    load_obj_file("./res/models/backpack/backpack.obj", &game_state);
+    
+    return 0;
 }
 
 int main_(int argc, char* argv[])
