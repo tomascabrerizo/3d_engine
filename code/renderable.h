@@ -8,13 +8,13 @@
 
 struct GameState;
 
-#define MESH_INDEX_MAX_SIZE 256
-#define MATERIAL_INDEX_MAX_SIZE 256
+#define REN_MESH_INDEX_MAX_SIZE 256
 
 struct Renderable
 {
-    uint32_t mesh_index[MESH_INDEX_MAX_SIZE];
-    uint32_t material_index[MATERIAL_INDEX_MAX_SIZE];
+    uint32_t mesh_index[REN_MESH_INDEX_MAX_SIZE];
+    uint32_t mesh_index_count = 0;
+    uint32_t material_index;
     
     v3 color;
     
@@ -28,6 +28,7 @@ struct Renderable
 
 Renderable renderable_create(MeshesIndex mesh_index, v3 color);
 Renderable renderable_create(MeshesIndex mesh_index, MaterialIndex material_index);
+Renderable renderable_create(uint32_t first_mesh_index, uint32_t mesh_index_count, MaterialIndex material_index);
 void renderable_update(Renderable* ren);
 void renderable_render(const Renderable& ren, uint32_t shader, GameState* gs);
 

@@ -20,6 +20,12 @@ struct String_View {
     const char* data;
 };
 
+//TODO(tomi):This should be the only MeshIndex, (remove the MeshIndex enum)
+struct MeshIndex_ {
+    uint32_t f_index;
+    uint32_t count;
+};
+
 String_View cstr_as_sv(const char* cstr);
 String_View sv_trim_left(const String_View& sv);
 String_View sv_trim_right(const String_View& sv);
@@ -36,6 +42,6 @@ void sv_print(const String_View& sv);
 
 file_info read_entire_file(const char* path);
 char* concat_string(const char* s0, const char* s1, char* s);
-void load_obj_file(const char* path, GameState* gs);
+MeshIndex_ load_obj_file(const char* path, GameState* gs);
 
 #endif

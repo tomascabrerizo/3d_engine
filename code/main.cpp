@@ -13,7 +13,6 @@
 #define internal static
 #define global static
 
-
 internal 
 void process_input(GameState* game_state)
 {
@@ -99,63 +98,51 @@ void game_init(GameState* game_state)
     game_state->game_textures[TEXTURE_BOX] = texture_create("./res/box.bmp");
     game_state->game_textures[TEXTURE_WOODBOX] = texture_create("./res/woodbox.bmp");
     game_state->game_textures[TEXTURE_WOODBOX_SPECULAR] = texture_create("./res/woodbox_specular.bmp");
-   
-    //Init meshes 
-    game_state->game_meshes[MESH_CUBE] = mesh_create(
-            cube_vert, sizeof(cube_vert), 
-            cube_tex, sizeof(cube_tex), 
-            cube_normal, sizeof(cube_normal));
-   
+    
+    game_state->game_textures[TEXTURE_BACKPACK_DIFUSE] = texture_create("./res/models/backpack/diffuse.bmp");
+    game_state->game_textures[TEXTURE_BACKPACK_SPECULAR] = texture_create("./res/models/backpack/specular.bmp");
+  
     //Init materials 
     game_state->game_materials[MATERIAL_TEST] = material_create(TEXTURE_WOODBOX, TEXTURE_WOODBOX_SPECULAR, 32);
+    game_state->game_materials[MATERIAL_BACKPACK] = material_create(TEXTURE_BACKPACK_DIFUSE, TEXTURE_BACKPACK_SPECULAR, 32);
     shader_set_int(game_state->shader_program, "material.diffuse", 0);
     shader_set_int(game_state->shader_program, "material.specular", 1);
-   
-    //Init light 
-    game_state->dir_light.direction = new_v3(-0.2f, -1.0f, -0.3f);
-    game_state->dir_light.ambient = new_v3(0.1f, 0.1f, 0.1f);
-    game_state->dir_light.diffuse = new_v3(0.2f, 0.2f, 0.2f);
-    game_state->dir_light.specular = new_v3(0.5f, 0.5f, 0.5f);
     
-    v3 pointLightPositions[] = {
-        new_v3( 0.7f,  0.2f,  2.0f),
-        new_v3( 2.3f, -3.3f, -4.0f),
-        new_v3(-4.0f,  2.0f, -12.0f),
-        new_v3( 0.0f,  0.0f, -3.0f)
-    };
+    //Init meshes
+    //game_state->game_meshes[MESH_CUBE] = mesh_create(
+    //        cube_vert, sizeof(cube_vert), 
+    //        cube_tex, sizeof(cube_tex), 
+    //        cube_normal, sizeof(cube_normal));
+    
 
-    for(uint32_t i = 0; i < MAX_POINT_LIGHTS; ++i)
-    {
-        game_state->point_lights[i].position = pointLightPositions[i];
-        game_state->point_lights[i].ambient = new_v3(0.05f, 0.05f, 0.05f);
-        game_state->point_lights[i].diffuse = new_v3(0.8f, (0.8f), 0.8f);
-        game_state->point_lights[i].specular = new_v3(1.0f, 1.0f, 1.0f);
-        game_state->point_lights[i].constant = 1.0f;
-        game_state->point_lights[i].linear = 0.22f; 
-        game_state->point_lights[i].quadratic = 0.20f; 
-    }
+    MeshIndex_ backpack_index = load_obj_file("./res/models/backpack/backpack.obj", game_state);
+    (void)backpack_index;
     
-    //Init Ren_Cubes
-    for(uint32_t i = 0; i < array_count(cubePositions); ++i)
+    //game_state->game_meshes[MESH_BACKPACK] = mesh_create(
+    //        game_state->backpack_vertices.data(), game_state->backpack_vertices.size()*sizeof(float),  
+    //        game_state->backpack_text_coords.data(), game_state->backpack_text_coords.size()*sizeof(float),  
+    //        game_state->backpack_normals.data(), game_state->backpack_normals.size()*sizeof(float)); 
+
+    for(uint32_t i = backpack_index.f_index; i < backpack_index.f_index + backpack_index.count; ++i)
     {
-        float angle = 20 * i;
-        game_state->ren_cubes[i] = renderable_create(MESH_CUBE, MATERIAL_TEST); 
-        game_state->ren_cubes[i].pos = cubePositions[i];
-        game_state->ren_cubes[i].scale = new_v3(1, 1, 1);
-        game_state->ren_cubes[i].rotate = new_v3(angle, angle*3, angle*5);
+        mesh_initialize(&game_state->game_meshes[i]);
     }
 
-    //Init Ren_Light
-    for(uint32_t i = 0; i < MAX_POINT_LIGHTS; ++i)
-    {
-        game_state->ren_lights[i] = renderable_create(MESH_CUBE, new_v3(1, 1, 1));
-        game_state->ren_lights[i].scale = new_v3(0.3, 0.3, 0.3);
-        game_state->ren_lights[i].pos = pointLightPositions[i]; 
-    } 
-    
+    //TODO(tomi): make a good way to now where the renderable meshes starts
+    //Init backpack renderable
+    //game_state->ren_backpack = renderable_create(MESH_BACKPACK, MATERIAL_BACKPACK);
+    game_state->ren_backpack = renderable_create(backpack_index.f_index, backpack_index.count, MATERIAL_BACKPACK); 
+
     //Init camera
     game_state->camera.speed = 3;
     game_state->camera.sensibility = 0.5f;
+    
+    //Init Lights
+    game_state->light_backpack.direction = new_v3(-0.2f, -1.0f, -0.3f);
+    game_state->light_backpack.ambient = new_v3(0.3f, 0.3f, 0.3f);
+    game_state->light_backpack.diffuse = new_v3(0.2f, 0.2f, 0.2f);
+    game_state->light_backpack.specular = new_v3(0.5f, 0.5f, 0.5f);
+    shader_set_dir_light(game_state->shader_program, "dir_light", game_state->light_backpack);
 
 }
 
@@ -195,26 +182,8 @@ void game_update(GameState* game_state, float dt)
     game_state->mouse_offset_y = 0;
     camera_update(&game_state->camera, game_state->shader_program);
     camera_update(&game_state->camera, game_state->shader_program2);
-    
-    //Update light uniforms
-    shader_set_int(game_state->shader_program, "NR_POINT_LIGHTS", (int)MAX_POINT_LIGHTS);
-    shader_set_dir_light(game_state->shader_program, "dir_light", game_state->dir_light);
-    for(uint32_t i = 0; i < MAX_POINT_LIGHTS; ++i)
-    {
-        char buffer[64];
-        sprintf(buffer, "point_lights[%d]", i);
-        shader_set_point_light(game_state->shader_program, buffer, game_state->point_lights[i]);
-    }
 
-    for(uint32_t i = 0; i < array_count(cubePositions); ++i)
-    {
-        renderable_update(&game_state->ren_cubes[i]);
-    }
-    
-    for(uint32_t i = 0; i < MAX_POINT_LIGHTS; ++i)
-    {
-        renderable_update(&game_state->ren_lights[i]);
-    } 
+    renderable_update(&game_state->ren_backpack);
 }
 
 void game_render(GameState* game_state)
@@ -222,29 +191,13 @@ void game_render(GameState* game_state)
     //TODO(tomi):Create a good renderer to render the differents vaos
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-    for(uint32_t i = 0; i < array_count(cubePositions); ++i)
-    {
-        renderable_render(game_state->ren_cubes[i], game_state->shader_program, game_state);
-    }
-    for(uint32_t i = 0; i < MAX_POINT_LIGHTS; ++i)
-    {
-        renderable_render(game_state->ren_lights[i], game_state->shader_program2, game_state);
-    } 
+    
+    renderable_render(game_state->ren_backpack, game_state->shader_program, game_state);
 
     SDL_GL_SwapWindow(game_state->window);
 }
 
 int main(int argc, char* argv[])
-{
-    GameState game_state = {};
-    game_init(&game_state);
-    load_obj_file("./res/models/backpack/backpack.obj", &game_state);
-    
-    return 0;
-}
-
-int main_(int argc, char* argv[])
 {
     GameState game_state = {};
     game_init(&game_state);

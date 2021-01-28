@@ -3,9 +3,7 @@
 
 #define MAX_TEXTURE_COUT 32
 #define MAX_MATERIAL_COUNT 32
-#define MAX_MESHES_COUNT 1024 
-#define MAX_POINT_LIGHTS 4
-
+#define MAX_MESHES_COUNT 256
 //Game textures
 enum TextureIndex {
     TEXTURE_EMPTY = 0,
@@ -13,6 +11,8 @@ enum TextureIndex {
     TEXTURE_BOX,
     TEXTURE_WOODBOX,
     TEXTURE_WOODBOX_SPECULAR,
+    TEXTURE_BACKPACK_DIFUSE,
+    TEXTURE_BACKPACK_SPECULAR,
 
     TEXTURE_COUNT,
 };
@@ -20,6 +20,7 @@ enum TextureIndex {
 enum MeshesIndex {
     MESH_EMPTY = 0,
     MESH_CUBE,
+    MESH_BACKPACK,
 
     MESH_COUNT
 };
@@ -27,6 +28,7 @@ enum MeshesIndex {
 enum MaterialIndex{
     MATERIAL_EMPTY= 0,
     MATERIAL_TEST,
+    MATERIAL_BACKPACK,
 
     MATERIAL_COUNT,
 };

@@ -132,14 +132,15 @@ int sv_to_int(String_View sv)
     return number;
 }
 
-void load_obj_file(const char* path, GameState* gs)
+MeshIndex_ load_obj_file(const char* path, GameState* gs)
 {
+    MeshIndex_ ms = {gs->last_mesh_index+1, 0};
     
     FILE* data = fopen(path, "r");
     if(!data)
     {
         printf("cannot find file (%s)\n", path);
-        return;
+        return {0 , 0};
     }
     
     char line[512];
@@ -158,6 +159,7 @@ void load_obj_file(const char* path, GameState* gs)
         if(sv_equals(header, "o"))
         {
             gs->last_mesh_index++;
+            ms.count++;
         }
         else if(sv_equals(header, "v"))
         {
@@ -168,6 +170,9 @@ void load_obj_file(const char* path, GameState* gs)
             float f1 = sv_to_float(s1);
             float f2 = sv_to_float(s2);
             vertices.push_back(new_v3(f0, f1, f2));
+            gs->backpack_vertices.push_back(f0);
+            gs->backpack_vertices.push_back(f1);
+            gs->backpack_vertices.push_back(f2);
         }
         else if(sv_equals(header, "vt"))
         {
@@ -176,6 +181,8 @@ void load_obj_file(const char* path, GameState* gs)
             float f0 = sv_to_float(s0);
             float f1 = sv_to_float(s1);
             text_coords.push_back(new_v2(f0, f1));
+            gs->backpack_text_coords.push_back(f0);
+            gs->backpack_text_coords.push_back(f1);
         }
         else if(sv_equals(header, "vn"))
         {
@@ -186,6 +193,9 @@ void load_obj_file(const char* path, GameState* gs)
             float f1 = sv_to_float(s1);
             float f2 = sv_to_float(s2);
             normals.push_back(new_v3(f0, f1, f2));
+            gs->backpack_normals.push_back(f0);
+            gs->backpack_normals.push_back(f1);
+            gs->backpack_normals.push_back(f2);
         }
         else if(sv_equals(header, "f"))
         {
@@ -217,14 +227,20 @@ void load_obj_file(const char* path, GameState* gs)
             int vn1_index = sv_to_int(svn1)-1;
             int vn2_index = sv_to_int(svn2)-1;
             
-            Vertex new_vertex0 = new_vertex(vertices[v0_index], normals[vn0_index], text_coords[vt0_index]);
-            Vertex new_vertex1 = new_vertex(vertices[v1_index], normals[vn1_index], text_coords[vt1_index]);
-            Vertex new_vertex2 = new_vertex(vertices[v2_index], normals[vn2_index], text_coords[vt2_index]);
-            
+            Vertex new_vertex0 = new_vertex(vertices[v0_index], text_coords[vt0_index], normals[vn0_index]);
+            Vertex new_vertex1 = new_vertex(vertices[v1_index], text_coords[vt1_index], normals[vn1_index]);
+            Vertex new_vertex2 = new_vertex(vertices[v2_index], text_coords[vt2_index], normals[vn2_index]);
+
             gs->game_meshes[gs->last_mesh_index].vertices.push_back(new_vertex0);
             gs->game_meshes[gs->last_mesh_index].vertices.push_back(new_vertex1);
             gs->game_meshes[gs->last_mesh_index].vertices.push_back(new_vertex2);
+
+            gs->game_meshes[gs->last_mesh_index].indices.push_back(v0_index);
+            gs->game_meshes[gs->last_mesh_index].indices.push_back(v1_index);
+            gs->game_meshes[gs->last_mesh_index].indices.push_back(v2_index);
         }
     }
-    printf("ready!\n");
+    printf("FILE:'%s' loaded!\n", path);
+    
+    return ms;
 }

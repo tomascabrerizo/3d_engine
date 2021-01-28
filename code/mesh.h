@@ -5,11 +5,11 @@
 
 struct Vertex {
     v3 position;
-    v3 normal;
     v2 tex_coord;
+    v3 normal;
 };
 
-Vertex new_vertex(v3 position, v3 normal, v2 tex_coord);
+Vertex new_vertex(v3 position, v2 tex_coord, v3 normal);
 
 struct Mesh {
     uint32_t vao;
@@ -23,7 +23,8 @@ struct Mesh {
     std::vector<uint32_t> texture_index;
 };
 
-Mesh mesh_create(std::vector<Vertex> vertice, std::vector<uint32_t> indices, std::vector<uint32_t> texture_index);
+Mesh mesh_create(std::vector<Vertex> vertice, std::vector<uint32_t> indices);
 Mesh mesh_create(float* vertices, uint32_t vertices_size, float* tex_coords, uint32_t tex_coords_size, float* normals, uint32_t normals_size);
+void mesh_initialize(Mesh* mesh);
 
 #endif

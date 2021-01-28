@@ -2,6 +2,7 @@
 #define GAME_STATE_H
 
 #include <SDL2/SDL.h>
+#include <vector>
 #include "math.h"
 #include "texture.h"
 #include "mesh.h"
@@ -40,12 +41,13 @@ struct GameState {
     Mesh game_meshes[MAX_MESHES_COUNT];
     uint32_t last_mesh_index = MESH_COUNT - 1;
 
+    DirLight light_backpack;
+    Renderable ren_backpack;
 
-    DirLight dir_light;
-    PointLight point_lights[MAX_POINT_LIGHTS];
-
-    Renderable ren_cubes[10];
-    Renderable ren_lights[MAX_POINT_LIGHTS];
+    //TEST(tomi)Test for DrawArrys
+    std::vector<float> backpack_vertices;
+    std::vector<float> backpack_normals;
+    std::vector<float> backpack_text_coords;
 
 };
 
