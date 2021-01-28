@@ -17,6 +17,7 @@ void camera_update(Camera* camera, uint32_t shader)
     shader_set_m4(shader, "view", v);
 }
 
+#include <iostream>
 void camera_set_direction(Camera* camera, float offset_x, float offset_y)
 {
     camera->yaw += offset_x * camera->sensibility;

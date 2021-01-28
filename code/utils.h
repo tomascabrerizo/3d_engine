@@ -1,6 +1,5 @@
 #ifndef UTILS_H
 #define UTILS_H
-
 #include <stdint.h>
 
 #define array_count(x) (sizeof(x)/sizeof(x[0]))
@@ -14,16 +13,9 @@ struct file_info
     
 };
 
-
 struct String_View {
     uint32_t count;
     const char* data;
-};
-
-//TODO(tomi):This should be the only MeshIndex, (remove the MeshIndex enum)
-struct MeshIndex_ {
-    uint32_t f_index;
-    uint32_t count;
 };
 
 String_View cstr_as_sv(const char* cstr);
@@ -37,11 +29,10 @@ float sv_to_float(String_View sv);
 int sv_to_int(String_View sv);
 
 bool sv_empty(const String_View& sv);
-bool sv_equals(const char* cstr);
+bool sv_equals(const String_View& sv, const char* cstr);
 void sv_print(const String_View& sv);
 
 file_info read_entire_file(const char* path);
 char* concat_string(const char* s0, const char* s1, char* s);
-MeshIndex_ load_obj_file(const char* path, GameState* gs);
 
 #endif

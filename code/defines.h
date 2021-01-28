@@ -17,14 +17,6 @@ enum TextureIndex {
     TEXTURE_COUNT,
 };
 
-enum MeshesIndex {
-    MESH_EMPTY = 0,
-    MESH_CUBE,
-    MESH_BACKPACK,
-
-    MESH_COUNT
-};
-
 enum MaterialIndex{
     MATERIAL_EMPTY= 0,
     MATERIAL_TEST,

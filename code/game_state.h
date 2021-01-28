@@ -2,7 +2,6 @@
 #define GAME_STATE_H
 
 #include <SDL2/SDL.h>
-#include <vector>
 #include "math.h"
 #include "texture.h"
 #include "mesh.h"
@@ -39,7 +38,7 @@ struct GameState {
     uint32_t last_material_index = MATERIAL_COUNT - 1;
     
     Mesh game_meshes[MAX_MESHES_COUNT];
-    uint32_t last_mesh_index = MESH_COUNT - 1;
+    uint32_t last_mesh_index = 0;
 
     DirLight light_backpack;
     Renderable ren_backpack;

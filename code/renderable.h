@@ -5,6 +5,7 @@
 #include "math.h"
 #include "utils.h"
 #include "defines.h"
+#include "mesh.h"
 
 struct GameState;
 
@@ -26,9 +27,8 @@ struct Renderable
     bool has_texture = false;
 };
 
-Renderable renderable_create(MeshesIndex mesh_index, v3 color);
-Renderable renderable_create(MeshesIndex mesh_index, MaterialIndex material_index);
-Renderable renderable_create(uint32_t first_mesh_index, uint32_t mesh_index_count, MaterialIndex material_index);
+Renderable renderable_create(MeshIndex mesh_index, v3 color);
+Renderable renderable_create(MeshIndex mesh_index, MaterialIndex material_index);
 void renderable_update(Renderable* ren);
 void renderable_render(const Renderable& ren, uint32_t shader, GameState* gs);
 
