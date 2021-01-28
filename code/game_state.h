@@ -43,12 +43,6 @@ struct GameState {
 
     DirLight light_backpack;
     Renderable ren_backpack;
-
-    //TEST(tomi)Test for DrawArrys
-    std::vector<float> backpack_vertices;
-    std::vector<float> backpack_normals;
-    std::vector<float> backpack_text_coords;
-
 };
 
 #endif

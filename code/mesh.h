@@ -13,14 +13,13 @@ Vertex new_vertex(v3 position, v2 tex_coord, v3 normal);
 
 struct Mesh {
     uint32_t vao;
-    uint32_t vertices_count;
     uint32_t tex_coords_count;
     uint32_t normals_count;
 
-    std::vector<Vertex> vertices;
-    std::vector<uint32_t> indices;
-    //NOTE(tomi):IMPORTANT this is texture index, from de array of texture not texture coords
-    std::vector<uint32_t> texture_index;
+    Vertex* vertices;
+    uint32_t vertices_count;
+    uint32_t* indices;
+    uint32_t indices_count;
 };
 
 Mesh mesh_create(std::vector<Vertex> vertice, std::vector<uint32_t> indices);

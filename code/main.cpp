@@ -98,7 +98,6 @@ void game_init(GameState* game_state)
     game_state->game_textures[TEXTURE_BOX] = texture_create("./res/box.bmp");
     game_state->game_textures[TEXTURE_WOODBOX] = texture_create("./res/woodbox.bmp");
     game_state->game_textures[TEXTURE_WOODBOX_SPECULAR] = texture_create("./res/woodbox_specular.bmp");
-    
     game_state->game_textures[TEXTURE_BACKPACK_DIFUSE] = texture_create("./res/models/backpack/diffuse.bmp");
     game_state->game_textures[TEXTURE_BACKPACK_SPECULAR] = texture_create("./res/models/backpack/specular.bmp");
   
@@ -107,22 +106,9 @@ void game_init(GameState* game_state)
     game_state->game_materials[MATERIAL_BACKPACK] = material_create(TEXTURE_BACKPACK_DIFUSE, TEXTURE_BACKPACK_SPECULAR, 32);
     shader_set_int(game_state->shader_program, "material.diffuse", 0);
     shader_set_int(game_state->shader_program, "material.specular", 1);
-    
-    //Init meshes
-    //game_state->game_meshes[MESH_CUBE] = mesh_create(
-    //        cube_vert, sizeof(cube_vert), 
-    //        cube_tex, sizeof(cube_tex), 
-    //        cube_normal, sizeof(cube_normal));
-    
 
     MeshIndex_ backpack_index = load_obj_file("./res/models/backpack/backpack.obj", game_state);
     (void)backpack_index;
-    
-    //game_state->game_meshes[MESH_BACKPACK] = mesh_create(
-    //        game_state->backpack_vertices.data(), game_state->backpack_vertices.size()*sizeof(float),  
-    //        game_state->backpack_text_coords.data(), game_state->backpack_text_coords.size()*sizeof(float),  
-    //        game_state->backpack_normals.data(), game_state->backpack_normals.size()*sizeof(float)); 
-
     for(uint32_t i = backpack_index.f_index; i < backpack_index.f_index + backpack_index.count; ++i)
     {
         mesh_initialize(&game_state->game_meshes[i]);
@@ -130,7 +116,6 @@ void game_init(GameState* game_state)
 
     //TODO(tomi): make a good way to now where the renderable meshes starts
     //Init backpack renderable
-    //game_state->ren_backpack = renderable_create(MESH_BACKPACK, MATERIAL_BACKPACK);
     game_state->ren_backpack = renderable_create(backpack_index.f_index, backpack_index.count, MATERIAL_BACKPACK); 
 
     //Init camera
@@ -138,10 +123,10 @@ void game_init(GameState* game_state)
     game_state->camera.sensibility = 0.5f;
     
     //Init Lights
-    game_state->light_backpack.direction = new_v3(-0.2f, -1.0f, -0.3f);
-    game_state->light_backpack.ambient = new_v3(0.3f, 0.3f, 0.3f);
-    game_state->light_backpack.diffuse = new_v3(0.2f, 0.2f, 0.2f);
-    game_state->light_backpack.specular = new_v3(0.5f, 0.5f, 0.5f);
+    game_state->light_backpack.direction = new_v3(-0.2f, -0.5f, -0.3f);
+    game_state->light_backpack.ambient = new_v3(0.4f, 0.4f, 0.4f);
+    game_state->light_backpack.diffuse = new_v3(0.6f, 0.6f, 0.6f);
+    game_state->light_backpack.specular = new_v3(0.9f, 0.9f, 0.9f);
     shader_set_dir_light(game_state->shader_program, "dir_light", game_state->light_backpack);
 
 }
