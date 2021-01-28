@@ -50,6 +50,7 @@ void renderable_render(const Renderable& ren, uint32_t shader, GameState* gs)
 
     shader_use_program(shader);
     shader_set_m4(shader, "model", ren.model);
+    //TODO(tomi):Try to no use if statement here, i think is not necesary
     if(ren.has_texture)
     {
         Material material = gs->game_materials[ren.material_index];

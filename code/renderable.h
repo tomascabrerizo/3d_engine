@@ -13,8 +13,10 @@ struct GameState;
 
 struct Renderable
 {
+    //TODO(tomi):Try to render oly using the MeshIndex struct
     uint32_t mesh_index[REN_MESH_INDEX_MAX_SIZE];
     uint32_t mesh_index_count = 0;
+    
     uint32_t material_index;
     
     v3 color;

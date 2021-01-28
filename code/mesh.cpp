@@ -47,16 +47,13 @@ MeshIndex mesh_create(Vertex* vertices, uint32_t vertices_count, uint32_t* indic
 {
     //TODO(tomi):Assert tha vertices and indices enter in gs->game_meshes and gs->game_indices 
     MeshIndex ms = {gs->last_mesh_index+1, 1};
-    gs->game_meshes[ms.f_index].vertices = (Vertex*)malloc(vertices_count*sizeof(Vertex));
-    for(uint32_t i = 0; i < vertices_count; ++i)
-    {
-        gs->game_meshes[ms.f_index].vertices[i] = vertices[i]; 
-    }
-    gs->game_meshes[ms.f_index].indices = (uint32_t*)malloc(indices_count*sizeof(uint32_t));
-    for(uint32_t i = 0; i < indices_count; ++i)
-    {
-        gs->game_meshes[ms.f_index].indices[i] = indices[i]; 
-    }
+    
+    gs->game_meshes[ms.f_index].vertices_count = vertices_count;
+    gs->game_meshes[ms.f_index].vertices = vertices; 
+    
+    gs->game_meshes[ms.f_index].indices_count = indices_count;
+    gs->game_meshes[ms.f_index].indices = indices; 
+    
     mesh_initialize(&gs->game_meshes[ms.f_index]);
     return ms;
 }
