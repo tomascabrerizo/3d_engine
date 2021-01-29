@@ -1,7 +1,6 @@
 #include <GL/glew.h>
 #include <stdio.h>
 #include <stddef.h>
-#include <vector>
 #include <assert.h>
 #include "mesh.h"
 #include "game_state.h"
@@ -68,16 +67,14 @@ MeshIndex mesh_load_from_obj(const char* path, GameState* gs)
         return {0 , 0};
     }
     
+    //NOTE(tomi):Get all the arrays sizes;
+    uint32_t mesh_index_count  = 0;
+    uint32_t vertices_count    = 0;
+    uint32_t text_coords_count = 0;
+    uint32_t normals_count     = 0;
+    uint32_t vertex_count      = 0;
+    uint32_t indices_count     = 0;
     char line[512];
-    //TODO(tomi):Try to implements obj parser without StringView and std::vector
-    std::vector<v3> vertices;
-    std::vector<v2> text_coords;
-    std::vector<v3> normals;
-    
-    std::vector<Vertex> vertexs;
-    std::vector<uint32_t> indices;
-    std::vector<uint32_t> mesh_index;
-
     while(fgets(line, sizeof(line), data))
     {
         String_View sv_line = sv_trim(cstr_as_sv(line));
@@ -87,7 +84,50 @@ MeshIndex mesh_load_from_obj(const char* path, GameState* gs)
         sv_line = sv_trim(sv_line);
         if(sv_equals(header, "o"))
         {
-            mesh_index.push_back(gs->last_mesh_index + 1);
+            mesh_index_count++;
+        }
+        else if(sv_equals(header, "v"))
+        {
+            vertices_count++; 
+        }
+        else if(sv_equals(header, "vt"))
+        {
+            text_coords_count++;
+        }
+        else if(sv_equals(header, "vn"))
+        {
+            normals_count++;
+        }
+        else if(sv_equals(header, "f"))
+        {
+            vertex_count+=3;
+            indices_count+=3;
+        }
+    }
+    //NOTE(tomi):Alloc all the necesary memory
+    uint32_t* mesh_index  = (uint32_t*)malloc(mesh_index_count*sizeof(uint32_t));
+    v3*       vertices    = (v3*)malloc(vertices_count*sizeof(v3));
+    v2*       text_coords = (v2*)malloc(text_coords_count*sizeof(v3));
+    v3*       normals     = (v3*)malloc(normals_count*sizeof(v3));
+    Vertex*   vertexs     = (Vertex*)malloc(vertex_count*sizeof(Vertex));
+    uint32_t* indices     = (uint32_t*)malloc(indices_count*sizeof(uint32_t));
+    
+    uint32_t o_index  = 0;
+    uint32_t v_index  = 0;
+    uint32_t vt_index = 0;
+    uint32_t vn_index = 0;
+    uint32_t f_index  = 0;
+    fseek(data, 0, SEEK_SET);
+    while(fgets(line, sizeof(line), data))
+    {
+        String_View sv_line = sv_trim(cstr_as_sv(line));
+        if(sv_empty(sv_line)) continue;
+        
+        String_View header = sv_trim(sv_chop_by_delim(&sv_line, ' '));
+        sv_line = sv_trim(sv_line);
+        if(sv_equals(header, "o"))
+        {
+            mesh_index[o_index++] = gs->last_mesh_index + 1;
             gs->last_mesh_index++;
             ms.count++;
         }
@@ -99,8 +139,7 @@ MeshIndex mesh_load_from_obj(const char* path, GameState* gs)
             float f0 = sv_to_float(s0);
             float f1 = sv_to_float(s1);
             float f2 = sv_to_float(s2);
-            //v3_dump(new_v3(f0, f1, f2));
-            vertices.push_back(new_v3(f0, f1, f2));
+            vertices[v_index++] = new_v3(f0, f1, f2);
         }
         else if(sv_equals(header, "vt"))
         {
@@ -108,7 +147,7 @@ MeshIndex mesh_load_from_obj(const char* path, GameState* gs)
             String_View s1 = sv_trim(sv_line);
             float f0 = sv_to_float(s0);
             float f1 = sv_to_float(s1);
-            text_coords.push_back(new_v2(f0, f1));
+            text_coords[vt_index++] = new_v2(f0, f1);
         }
         else if(sv_equals(header, "vn"))
         {
@@ -118,7 +157,7 @@ MeshIndex mesh_load_from_obj(const char* path, GameState* gs)
             float f0 = sv_to_float(s0);
             float f1 = sv_to_float(s1);
             float f2 = sv_to_float(s2);
-            normals.push_back(new_v3(f0, f1, f2));
+            normals[vn_index++] = new_v3(f0, f1, f2);
         }
         else if(sv_equals(header, "f"))
         {
@@ -150,33 +189,38 @@ MeshIndex mesh_load_from_obj(const char* path, GameState* gs)
             int vn1_index = sv_to_int(svn1)-1;
             int vn2_index = sv_to_int(svn2)-1;
             
-            indices.push_back(v0_index);
-            indices.push_back(v1_index);
-            indices.push_back(v2_index);
 
             Vertex new_vertex0 = new_vertex(vertices[v0_index], text_coords[vt0_index], normals[vn0_index]);
             Vertex new_vertex1 = new_vertex(vertices[v1_index], text_coords[vt1_index], normals[vn1_index]);
             Vertex new_vertex2 = new_vertex(vertices[v2_index], text_coords[vt2_index], normals[vn2_index]);
             
-            vertexs.push_back(new_vertex0);
-            vertexs.push_back(new_vertex1);
-            vertexs.push_back(new_vertex2);
+            vertexs[f_index] = new_vertex0;
+            indices[f_index++] = v0_index;
+            
+            vertexs[f_index] = new_vertex1;
+            indices[f_index++] = v1_index;
+            
+            vertexs[f_index] = new_vertex2;
+            indices[f_index++] = v2_index;
+            
         }
     }
     
-    for(uint32_t index: mesh_index)
+    for(uint32_t i = 0; i < mesh_index_count; ++i)
     {
-        gs->game_meshes[index].vertices = (Vertex*)malloc(vertexs.size()*sizeof(Vertex));
-        gs->game_meshes[index].vertices_count = vertexs.size();
+        uint32_t index = mesh_index[i];
+
+        gs->game_meshes[index].vertices = (Vertex*)malloc(vertex_count*sizeof(Vertex));
+        gs->game_meshes[index].vertices_count = vertex_count;
         
-        gs->game_meshes[index].indices = (uint32_t*)malloc(indices.size()*sizeof(uint32_t));
-        gs->game_meshes[index].indices_count = indices.size();
+        gs->game_meshes[index].indices = (uint32_t*)malloc(indices_count*sizeof(uint32_t));
+        gs->game_meshes[index].indices_count = indices_count;
         
-        for(uint32_t i = 0; i < vertexs.size(); ++i)
+        for(uint32_t i = 0; i < vertex_count; ++i)
         {
             gs->game_meshes[index].vertices[indices[i]] = vertexs[i];
         }
-        for(uint32_t i = 0; i < indices.size(); ++i)
+        for(uint32_t i = 0; i < indices_count; ++i)
         {
             gs->game_meshes[index].indices[i] = indices[i];
         }
@@ -185,6 +229,14 @@ MeshIndex mesh_load_from_obj(const char* path, GameState* gs)
         free(gs->game_meshes[index].indices);
     }
 
+    //NOTE(tomi):Free all allocated memory that is no needed any more
+    free(mesh_index); 
+    free(vertices);   
+    free(text_coords);
+    free(normals);    
+    free(vertexs);    
+    free(indices);    
+    
     printf("FILE:'%s' loaded!\n", path);
     return ms;
 }
