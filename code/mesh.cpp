@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stddef.h>
 #include <vector>
+#include <assert.h>
 #include "mesh.h"
 #include "game_state.h"
 
@@ -38,15 +39,12 @@ void mesh_initialize(Mesh* mesh)
     glGenBuffers(1, &ebo);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, mesh->indices_count*sizeof(uint32_t), mesh->indices, GL_STATIC_DRAW);
-
-    free(mesh->vertices);
-    free(mesh->indices);
 }
 
 MeshIndex mesh_create(Vertex* vertices, uint32_t vertices_count, uint32_t* indices, uint32_t indices_count, GameState* gs)
 {
-    //TODO(tomi):Assert tha vertices and indices enter in gs->game_meshes and gs->game_indices 
     MeshIndex ms = {gs->last_mesh_index+1, 1};
+    assert(ms.f_index < MAX_MESHES_COUNT);
     
     gs->game_meshes[ms.f_index].vertices_count = vertices_count;
     gs->game_meshes[ms.f_index].vertices = vertices; 
@@ -60,8 +58,8 @@ MeshIndex mesh_create(Vertex* vertices, uint32_t vertices_count, uint32_t* indic
 
 MeshIndex mesh_load_from_obj(const char* path, GameState* gs)
 {
-    //TODO(tomi):Assert tha vertices and indices enter in gs->game_meshes and gs->game_indices 
     MeshIndex ms = {gs->last_mesh_index+1, 0};
+    assert(ms.f_index < MAX_MESHES_COUNT);
     
     FILE* data = fopen(path, "r");
     if(!data)
@@ -87,7 +85,13 @@ MeshIndex mesh_load_from_obj(const char* path, GameState* gs)
         
         String_View header = sv_trim(sv_chop_by_delim(&sv_line, ' '));
         sv_line = sv_trim(sv_line);
-        if(sv_equals(header, "v"))
+        if(sv_equals(header, "o"))
+        {
+            mesh_index.push_back(gs->last_mesh_index + 1);
+            gs->last_mesh_index++;
+            ms.count++;
+        }
+        else if(sv_equals(header, "v"))
         {
             String_View s0 = sv_chop_by_delim(&sv_line, ' ');
             String_View s1 = sv_chop_by_delim(&sv_line, ' ');
@@ -115,22 +119,6 @@ MeshIndex mesh_load_from_obj(const char* path, GameState* gs)
             float f1 = sv_to_float(s1);
             float f2 = sv_to_float(s2);
             normals.push_back(new_v3(f0, f1, f2));
-        }
-    }
-    
-    fseek(data, 0, SEEK_SET);
-
-    while(fgets(line, sizeof(line), data))
-    {
-        String_View sv_line = sv_trim(cstr_as_sv(line));
-        if(sv_empty(sv_line)) continue;  
-        String_View header = sv_trim(sv_chop_by_delim(&sv_line, ' '));
-
-        if(sv_equals(header, "o"))
-        {
-            mesh_index.push_back(gs->last_mesh_index + 1);
-            gs->last_mesh_index++;
-            ms.count++;
         }
         else if(sv_equals(header, "f"))
         {
@@ -193,6 +181,8 @@ MeshIndex mesh_load_from_obj(const char* path, GameState* gs)
             gs->game_meshes[index].indices[i] = indices[i];
         }
         mesh_initialize(&gs->game_meshes[index]);
+        free(gs->game_meshes[index].vertices);
+        free(gs->game_meshes[index].indices);
     }
 
     printf("FILE:'%s' loaded!\n", path);

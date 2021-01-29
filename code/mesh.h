@@ -13,7 +13,6 @@ struct Vertex {
 
 Vertex new_vertex(v3 position, v2 tex_coord, v3 normal);
 
-//TODO(tomi):This should be the only MeshIndex, (remove the MeshIndex enum)
 struct MeshIndex {
     uint32_t f_index;
     uint32_t count;
@@ -29,6 +28,7 @@ struct Mesh {
 };
 
 MeshIndex mesh_create(Vertex* vertices, uint32_t vertices_count, uint32_t* indices, uint32_t indices_count, GameState* gs);
+//TODO(tomi):This function can be done with less loops 
 MeshIndex mesh_load_from_obj(const char* path, GameState* gs);
 void mesh_initialize(Mesh* mesh);
 

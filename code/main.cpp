@@ -112,6 +112,7 @@ void game_init(GameState* game_state)
 
     //Init backpack renderable
     game_state->ren_backpack = renderable_create(backpack_index , MATERIAL_BACKPACK); 
+    game_state->ren_backpack.pos = new_v3(0, 0, -1);
 
     //Init camera
     game_state->camera.speed = 3;
