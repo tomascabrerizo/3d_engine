@@ -108,11 +108,14 @@ void game_init(GameState* game_state)
     shader_set_int(game_state->shader_program, "material.specular", 1);
     
     //Init Meshes
-    MeshIndex backpack_index = mesh_load_from_obj("./res/models/backpack/backpack.obj", game_state);
+    game_state->game_meshes[MESH_BACKPACK] = mesh_load_from_obj("./res/models/backpack/backpack.obj", game_state);
 
     //Init backpack renderable
-    game_state->ren_backpack = renderable_create(backpack_index , MATERIAL_BACKPACK); 
-    game_state->ren_backpack.pos = new_v3(0, 0, -1);
+    game_state->ren_backpack = renderable_create(MESH_BACKPACK, MATERIAL_BACKPACK); 
+    game_state->ren_backpack.pos = new_v3(-2, 0, -1);
+    game_state->ren_backpack2 = renderable_create(MESH_BACKPACK, MATERIAL_BACKPACK); 
+    game_state->ren_backpack2.pos = new_v3(2, 0, -1);
+    game_state->ren_backpack2.rotate = new_v3(0, 180, 0);
 
     //Init camera
     game_state->camera.speed = 3;
@@ -165,6 +168,7 @@ void game_update(GameState* game_state, float dt)
     camera_update(&game_state->camera, game_state->shader_program2);
 
     renderable_update(&game_state->ren_backpack);
+    renderable_update(&game_state->ren_backpack2);
 }
 
 void game_render(GameState* game_state)
@@ -174,6 +178,7 @@ void game_render(GameState* game_state)
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     
     renderable_render(game_state->ren_backpack, game_state->shader_program, game_state);
+    renderable_render(game_state->ren_backpack2, game_state->shader_program, game_state);
 
     SDL_GL_SwapWindow(game_state->window);
 }

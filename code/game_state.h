@@ -42,6 +42,7 @@ struct GameState {
 
     DirLight light_backpack;
     Renderable ren_backpack;
+    Renderable ren_backpack2;
 };
 
 #endif

@@ -13,11 +13,6 @@ struct Vertex {
 
 Vertex new_vertex(v3 position, v2 tex_coord, v3 normal);
 
-struct MeshIndex {
-    uint32_t f_index;
-    uint32_t count;
-};
-
 struct Mesh {
     uint32_t vao;
 
@@ -27,9 +22,9 @@ struct Mesh {
     uint32_t indices_count;
 };
 
-MeshIndex mesh_create(Vertex* vertices, uint32_t vertices_count, uint32_t* indices, uint32_t indices_count, GameState* gs);
+Mesh mesh_create(Vertex* vertices, uint32_t vertices_count, uint32_t* indices, uint32_t indices_count, GameState* gs);
 //TODO(tomi):This function can be done with less loops 
-MeshIndex mesh_load_from_obj(const char* path, GameState* gs);
+Mesh mesh_load_from_obj(const char* path, GameState* gs);
 void mesh_initialize(Mesh* mesh);
 
 #endif

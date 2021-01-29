@@ -4,7 +4,16 @@
 #define MAX_TEXTURE_COUT 32
 #define MAX_MATERIAL_COUNT 32
 #define MAX_MESHES_COUNT 256
-//Game textures
+
+enum MeshIndex {
+    MESH_EMPTY = 0,
+    MESH_BOX,
+    MESH_BACKPACK,
+
+    MESH_COUNT,
+};
+
+//NOTE(tomi):Game textures
 enum TextureIndex {
     TEXTURE_EMPTY = 0,
     TEXTURE_CUBE,
@@ -17,6 +26,7 @@ enum TextureIndex {
     TEXTURE_COUNT,
 };
 
+//NOTE(tomi):Game Materials
 enum MaterialIndex{
     MATERIAL_EMPTY= 0,
     MATERIAL_TEST,
