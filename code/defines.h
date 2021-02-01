@@ -9,6 +9,7 @@ enum MeshIndex {
     MESH_EMPTY = 0,
     MESH_BOX,
     MESH_BACKPACK,
+    MESH_TERRAIN,
 
     MESH_COUNT,
 };
@@ -16,12 +17,12 @@ enum MeshIndex {
 //NOTE(tomi):Game textures
 enum TextureIndex {
     TEXTURE_EMPTY = 0,
-    TEXTURE_CUBE,
     TEXTURE_BOX,
     TEXTURE_WOODBOX,
     TEXTURE_WOODBOX_SPECULAR,
     TEXTURE_BACKPACK_DIFUSE,
     TEXTURE_BACKPACK_SPECULAR,
+    TEXTURE_TERRAIN,
 
     TEXTURE_COUNT,
 };
@@ -29,8 +30,9 @@ enum TextureIndex {
 //NOTE(tomi):Game Materials
 enum MaterialIndex{
     MATERIAL_EMPTY= 0,
-    MATERIAL_TEST,
+    MATERIAL_BOX,
     MATERIAL_BACKPACK,
+    MATERIAL_TERRAIN,
 
     MATERIAL_COUNT,
 };

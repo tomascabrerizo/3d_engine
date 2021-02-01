@@ -11,6 +11,11 @@ v2 new_v2(float x, float y)
     return {x, y};
 }
 
+v2 operator*(const v2& v0, const float& a)
+{
+    return {v0.x * a, v0.y * a};
+}
+
 v3 new_v3(float x, float y, float z)
 {
     return {x, y, z};

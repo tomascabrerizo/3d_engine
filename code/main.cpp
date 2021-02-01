@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
+#include <assert.h>
 #include <SDL2/SDL.h>
 #include <GL/glew.h>
 #include "shader.h"
@@ -9,6 +10,7 @@
 #include "game_state.h"
 #include "renderable.h"
 #include "utils.h"
+#include "terrain.h"
 
 #define internal static
 #define global static
@@ -78,6 +80,7 @@ SDL_Window* initialize_platform(GameState* game_state)
     SDL_GL_SetSwapInterval(1);
     SDL_SetRelativeMouseMode(SDL_TRUE);
     printf("OpenGL version: (%s)\n", glGetString(GL_VERSION));
+    //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     
     return window; 
 }
@@ -93,8 +96,13 @@ void game_init(GameState* game_state)
     shader_set_m4(game_state->shader_program, "projection", p);
     shader_set_m4(game_state->shader_program2, "projection", p);
     
+    //Important Asserts
+    assert(MESH_COUNT < MAX_MESHES_COUNT);
+    assert(TEXTURE_COUNT < MAX_TEXTURE_COUT);
+    assert(MATERIAL_COUNT < MAX_MATERIAL_COUNT);
+
     //Init textures
-    game_state->game_textures[TEXTURE_CUBE] = texture_create("./res/texture.bmp");
+    game_state->game_textures[TEXTURE_TERRAIN] = texture_create("./res/texture.bmp");
     game_state->game_textures[TEXTURE_BOX] = texture_create("./res/box.bmp");
     game_state->game_textures[TEXTURE_WOODBOX] = texture_create("./res/woodbox.bmp");
     game_state->game_textures[TEXTURE_WOODBOX_SPECULAR] = texture_create("./res/woodbox_specular.bmp");
@@ -102,23 +110,25 @@ void game_init(GameState* game_state)
     game_state->game_textures[TEXTURE_BACKPACK_SPECULAR] = texture_create("./res/models/backpack/specular.bmp");
   
     //Init materials 
-    game_state->game_materials[MATERIAL_TEST] = material_create(TEXTURE_WOODBOX, TEXTURE_WOODBOX_SPECULAR, 32);
+    game_state->game_materials[MATERIAL_BOX] = material_create(TEXTURE_WOODBOX, TEXTURE_WOODBOX_SPECULAR, 32);
     game_state->game_materials[MATERIAL_BACKPACK] = material_create(TEXTURE_BACKPACK_DIFUSE, TEXTURE_BACKPACK_SPECULAR, 32);
+    game_state->game_materials[MATERIAL_TERRAIN] = material_create(TEXTURE_TERRAIN, TEXTURE_EMPTY, 32);
     shader_set_int(game_state->shader_program, "material.diffuse", 0);
     shader_set_int(game_state->shader_program, "material.specular", 1);
     
     //Init Meshes
+    game_state->game_meshes[MESH_BOX] = mesh_load_from_obj("./res/models/cube/cube.obj", game_state);
     game_state->game_meshes[MESH_BACKPACK] = mesh_load_from_obj("./res/models/backpack/backpack.obj", game_state);
+    game_state->game_meshes[MESH_TERRAIN] = terrain_generate();
 
     //Init backpack renderable
     game_state->ren_backpack = renderable_create(MESH_BACKPACK, MATERIAL_BACKPACK); 
-    game_state->ren_backpack.pos = new_v3(-2, 0, -1);
-    game_state->ren_backpack2 = renderable_create(MESH_BACKPACK, MATERIAL_BACKPACK); 
-    game_state->ren_backpack2.pos = new_v3(2, 0, -1);
-    game_state->ren_backpack2.rotate = new_v3(0, 180, 0);
-
+    game_state->ren_backpack.pos = new_v3(-3, 0, 0);
+    game_state->ren_terrain = renderable_create(MESH_TERRAIN, MATERIAL_TERRAIN); 
+    game_state->ren_terrain.pos = new_v3(0, -10, 0);
+    
     //Init camera
-    game_state->camera.speed = 3;
+    game_state->camera.speed = 10;
     game_state->camera.sensibility = 0.5f;
     
     //Init Lights
@@ -166,9 +176,9 @@ void game_update(GameState* game_state, float dt)
     game_state->mouse_offset_y = 0;
     camera_update(&game_state->camera, game_state->shader_program);
     camera_update(&game_state->camera, game_state->shader_program2);
-
+    
     renderable_update(&game_state->ren_backpack);
-    renderable_update(&game_state->ren_backpack2);
+    renderable_update(&game_state->ren_terrain);
 }
 
 void game_render(GameState* game_state)
@@ -178,7 +188,7 @@ void game_render(GameState* game_state)
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     
     renderable_render(game_state->ren_backpack, game_state->shader_program, game_state);
-    renderable_render(game_state->ren_backpack2, game_state->shader_program, game_state);
+    renderable_render(game_state->ren_terrain, game_state->shader_program, game_state);
 
     SDL_GL_SwapWindow(game_state->window);
 }

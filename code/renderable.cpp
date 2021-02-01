@@ -53,6 +53,7 @@ void renderable_render(const Renderable& ren, uint32_t shader, GameState* gs)
     }
     
     Mesh mesh = gs->game_meshes[ren.mesh_index];
-    glBindVertexArray(gs->game_meshes[ren.mesh_index].vao);
+    glBindVertexArray(mesh.vao);
     glDrawElements(GL_TRIANGLES, mesh.indices_count, GL_UNSIGNED_INT, 0);
+    //glDrawArrays(GL_TRIANGLES, 0, mesh.vertices_count);
 }

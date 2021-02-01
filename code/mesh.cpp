@@ -100,10 +100,10 @@ Mesh mesh_load_from_obj(const char* path, GameState* gs)
     Vertex*   vertexs     = (Vertex*)malloc(vertex_count*sizeof(Vertex));
     uint32_t* indices     = (uint32_t*)malloc(indices_count*sizeof(uint32_t));
     
-    uint32_t v_index    = 0;
-    uint32_t vt_index   = 0;
-    uint32_t vn_index   = 0;
-    uint32_t f_index    = 0;
+    uint32_t v_index  = 0;
+    uint32_t vt_index = 0;
+    uint32_t vn_index = 0;
+    uint32_t f_index  = 0;
     fseek(data, 0, SEEK_SET);
     while(fgets(line, sizeof(line), data))
     {

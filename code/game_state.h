@@ -11,8 +11,8 @@
 #include "defines.h"
 #include "renderable.h"
 
-const int WINDOW_WIDTH = 800;
-const int WINDOW_HEIGHT = 600;
+const int WINDOW_WIDTH = 1280;
+const int WINDOW_HEIGHT = 720;
 
 struct GameState {
     
@@ -42,7 +42,7 @@ struct GameState {
 
     DirLight light_backpack;
     Renderable ren_backpack;
-    Renderable ren_backpack2;
+    Renderable ren_terrain;
 };
 
 #endif

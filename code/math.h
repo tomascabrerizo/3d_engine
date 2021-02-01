@@ -11,6 +11,7 @@ struct v2 {
 };
 
 v2 new_v2(float x, float y);
+v2 operator*(const v2& v0, const float& a);
 
 struct v3 {
     float x;
