@@ -7,6 +7,7 @@
 #define TERRAIN_VERTEX_COUNT 128 
 #define TERRAIN_INDICES_COUNT (6 * (TERRAIN_VERTEX_COUNT - 1))
 
+//TODO(tomi):Move this function to terrain.cpp
 Mesh terrain_generate()
 {
     Mesh terrain = {};
@@ -58,7 +59,7 @@ Mesh terrain_generate()
     }
 
     mesh_initialize(&terrain);
-    printf("TERRAIN loaded!\n");
+    printf("TERRAIN: loaded!\n");
     return terrain;
 }
 

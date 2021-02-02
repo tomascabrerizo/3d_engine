@@ -88,10 +88,7 @@ SDL_Window* initialize_platform(GameState* game_state)
 
 void game_init(GameState* game_state)
 {
-    //TODO(tomi):IMPORTANT Take out user_program form shader_set_uniforms functios
-
     game_state->window = initialize_platform(game_state);
-    
     //Important Asserts
     assert(SHADER_COUNT < MAX_SHADERS_COUNT);
     assert(MESH_COUNT < MAX_MESHES_COUNT);
@@ -153,6 +150,7 @@ void game_init(GameState* game_state)
     m4 p = perspective(60.0f, (float)WINDOW_WIDTH/(float)WINDOW_HEIGHT, 0.1f, 100.0f);
     for(int i = 0; i < SHADER_COUNT; ++i)
     { 
+        shader_use_program(game_state->shaders[i]);
         shader_set_m4(game_state->shaders[i], "projection", p);
         shader_set_dir_light(game_state->shaders[i], "dir_light", game_state->light_backpack);
     }
@@ -194,6 +192,7 @@ void game_update(GameState* game_state, float dt)
     //TODO(tomi):Maybe create a function to update all shaders 
     for(int i = 0; i < SHADER_COUNT; ++i)
     {
+        shader_use_program(game_state->shaders[i]);
         shader_set_v3(game_state->shaders[i], "view_pos", game_state->camera.pos);
         camera_update(&game_state->camera, game_state->shaders[i]);
     }
