@@ -8,7 +8,7 @@
 struct Camera {
     float yaw = -90.0f;
     float pitch = 0.0f;
-    v3 pos = new_v3(0, 0, 6);
+    v3 pos = new_v3(0, 1, 6);
     v3 front = new_v3(0, 0, -1);
     v3 world_up = new_v3(0, 1, 0);
     float speed = 5;

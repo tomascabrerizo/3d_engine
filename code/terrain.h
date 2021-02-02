@@ -16,6 +16,7 @@ Mesh terrain_generate()
     terrain.vertices = (Vertex*)malloc(terrain.vertices_count*sizeof(Vertex));
     terrain.indices = (uint32_t*)malloc(terrain.indices_count*sizeof(uint32_t));
 
+    //TODO(tomi):Calculate Normals
     for(uint32_t z = 0; z < TERRAIN_VERTEX_COUNT; ++z)
     {
         for(uint32_t x = 0; x < TERRAIN_VERTEX_COUNT; ++x)
@@ -23,9 +24,18 @@ Mesh terrain_generate()
             uint32_t index = (z*TERRAIN_VERTEX_COUNT)+x;
             float terrain_x = (float)x / (float)(TERRAIN_VERTEX_COUNT - 1);
             float terrain_z = (float)z / (float)(TERRAIN_VERTEX_COUNT - 1);
-            terrain.vertices[index].position  = new_v3(terrain_x*TERRAIN_SIZE, (sinf(x)+cosf(z))*5, terrain_z * TERRAIN_SIZE) - new_v3(TERRAIN_SIZE/2, 0, TERRAIN_SIZE/2);
-            terrain.vertices[index].tex_coord = new_v2(terrain_x, terrain_z)*TERRAIN_VERTEX_COUNT;
-            terrain.vertices[index].normal = new_v3(0.0f, 1.0f, 0.0f);
+            
+            v3 current_pos = new_v3(terrain_x*TERRAIN_SIZE, 0, terrain_z * TERRAIN_SIZE);
+            terrain.vertices[index].position  = current_pos - new_v3(TERRAIN_SIZE/2, 0, TERRAIN_SIZE/2);
+            terrain.vertices[index].tex_coord = new_v2(terrain_x, terrain_z) * TERRAIN_VERTEX_COUNT;
+            
+            float terrain_new_x = (float)(1 / (float)(TERRAIN_VERTEX_COUNT - 1))*TERRAIN_SIZE;
+            float terrain_new_z = (float)(1 / (float)(TERRAIN_VERTEX_COUNT - 1))*TERRAIN_SIZE;
+            //TODO(tomi):Make this normal generator better
+            v3 v0 = normalize(new_v3(terrain_new_x, 0, 0) - current_pos);
+            v3 v1 = normalize(new_v3(0, 0, terrain_new_z) - current_pos);
+
+            terrain.vertices[index].normal = normalize(cross(v0, v1));
         }
     }
     

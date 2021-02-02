@@ -10,6 +10,7 @@
 #include "light.h"
 #include "defines.h"
 #include "renderable.h"
+#include "renderer.h"
 
 const int WINDOW_WIDTH = 1280;
 const int WINDOW_HEIGHT = 720;
@@ -25,24 +26,19 @@ struct GameState {
     //Mouse 
     float mouse_offset_x = 0;
     float mouse_offset_y = 0;
-    
-    uint32_t shader_program;
-    uint32_t shader_program2;
-
     Camera camera;
 
+    uint32_t shaders[MAX_SHADERS_COUNT];
     Texture game_textures[MAX_TEXTURE_COUT];
-    uint32_t last_texture_index = TEXTURE_COUNT - 1;
-
     Material game_materials[MAX_MATERIAL_COUNT];
-    uint32_t last_material_index = MATERIAL_COUNT - 1;
-    
     Mesh game_meshes[MAX_MESHES_COUNT];
-    uint32_t last_mesh_index = 0;
 
     DirLight light_backpack;
-    Renderable ren_backpack;
+    
+    Renderable ren_tree[TREE_COUNT];
     Renderable ren_terrain;
+
+    Renderer renderer;
 };
 
 #endif

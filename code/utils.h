@@ -35,4 +35,7 @@ void sv_print(const String_View& sv);
 file_info read_entire_file(const char* path);
 char* concat_string(const char* s0, const char* s1, char* s);
 
+//NOTE(tomi):IMPORTANT srand() must be initiallized
+int rand_int(int main, int max);
+
 #endif

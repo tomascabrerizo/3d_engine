@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
+#include <time.h>
 #include "math.h"
 #include "utils.h"
 #include "game_state.h"
@@ -129,4 +130,11 @@ int sv_to_int(String_View sv)
     sprintf(cstr_number, "%.*s", sv.count, sv.data);
     int number = atoi(cstr_number);
     return number;
+}
+
+int rand_int(int min, int max)
+{
+    int shift =  max - min;
+    int r = rand()%shift;
+    return min + r; 
 }

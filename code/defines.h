@@ -1,15 +1,27 @@
 #ifndef DEFINES_H
 #define DEFINES_H
 
+#define TREE_COUNT 4096 
+
 #define MAX_TEXTURE_COUT 32
 #define MAX_MATERIAL_COUNT 32
-#define MAX_MESHES_COUNT 256
+#define MAX_MESHES_COUNT 32 
+#define MAX_SHADERS_COUNT 32
+
+enum ShadersIndex {
+    SHADER_EMPTY = 0,
+    SHADER_COLOR,
+    SHADER_TEXTURE,
+    SHADER_TERRAIN,
+
+    SHADER_COUNT,
+};
 
 enum MeshIndex {
     MESH_EMPTY = 0,
-    MESH_BOX,
     MESH_BACKPACK,
     MESH_TERRAIN,
+    MESH_TREE,
 
     MESH_COUNT,
 };
@@ -17,11 +29,9 @@ enum MeshIndex {
 //NOTE(tomi):Game textures
 enum TextureIndex {
     TEXTURE_EMPTY = 0,
-    TEXTURE_BOX,
-    TEXTURE_WOODBOX,
-    TEXTURE_WOODBOX_SPECULAR,
     TEXTURE_BACKPACK_DIFUSE,
     TEXTURE_BACKPACK_SPECULAR,
+    TEXTURE_TREE,
     TEXTURE_TERRAIN,
 
     TEXTURE_COUNT,
@@ -30,8 +40,8 @@ enum TextureIndex {
 //NOTE(tomi):Game Materials
 enum MaterialIndex{
     MATERIAL_EMPTY= 0,
-    MATERIAL_BOX,
     MATERIAL_BACKPACK,
+    MATERIAL_TREE,
     MATERIAL_TERRAIN,
 
     MATERIAL_COUNT,

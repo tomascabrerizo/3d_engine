@@ -20,11 +20,8 @@ struct Renderable
     v3 scale = {1.0f, 1.0f, 1.0f}; //if scale init to 0 the object will not have size
     v3 rotate;
     m4 model;
-
-    bool has_texture = false;
 };
 
-Renderable renderable_create(MeshIndex mesh_index, v3 color);
 Renderable renderable_create(MeshIndex mesh_index, MaterialIndex material_index);
 void renderable_update(Renderable* ren);
 void renderable_render(const Renderable& ren, uint32_t shader, GameState* gs);
