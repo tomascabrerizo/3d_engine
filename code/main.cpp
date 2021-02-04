@@ -85,11 +85,14 @@ SDL_Window* initialize_platform(GameState* game_state)
     glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
     
+    game_state->running = true;
+
     return window; 
 }
 
 void game_init(GameState* game_state)
 {
+    *game_state = {};
     game_state->window = initialize_platform(game_state);
     //Important Asserts
     assert(SHADER_COUNT < MAX_SHADERS_COUNT);
@@ -237,19 +240,19 @@ void game_render(GameState* game_state)
 
 int main(int argc, char* argv[])
 {
-    GameState game_state = {};
-    game_init(&game_state);
+    GameState* game_state = (GameState*)malloc(sizeof(GameState));
+    game_init(game_state);
 
     uint32_t last_time = 0;
     float dt = 0.016;
     uint32_t current_time;
-
-    while(game_state.running)
+    
+    while(game_state->running)
     {
-        process_input(&game_state);
+        process_input(game_state);
         
-        game_update(&game_state, dt);
-        game_render(&game_state);
+        game_update(game_state, dt);
+        game_render(game_state);
         
         current_time = SDL_GetTicks();
         dt = ((float)current_time - (float)last_time) / 1000.0f;
