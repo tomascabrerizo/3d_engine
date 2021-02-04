@@ -37,6 +37,8 @@ struct GameState {
     
     Renderable ren_tree[TREE_COUNT];
     Renderable ren_terrain;
+    Renderable ren_grass[GRASS_COUNT];
+    Renderable ren_fern[FERN_COUNT];
 
     Renderer renderer;
 };

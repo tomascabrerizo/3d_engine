@@ -13,6 +13,8 @@ void renderer_add(Renderer* renderer, Renderable* ren, uint32_t ren_count, uint3
     renderer->render_queue[index].shader = gs->shaders[shader]; 
     renderer->render_queue[index].count = ren_count;
     renderer->render_queue[index].vao = gs->game_meshes[ren->mesh_index].vao;
+    renderer->render_queue[index].has_alpha = ren[0].has_alpha;
+    renderer->render_queue[index].fake_light = ren[0].fake_light;
     renderer->index++; 
 }
 
@@ -24,10 +26,17 @@ void renderer_render(Renderer* renderer, GameState* gs)
         uint32_t shader =  renderer->render_queue[i].shader;
         uint32_t material_index = renderer->render_queue[i].renderable[0].material_index;
         Material material = gs->game_materials[material_index];
-
+        bool has_alpha = renderer->render_queue[i].has_alpha;
+        bool fake_light = renderer->render_queue[i].fake_light;
+        if(has_alpha)
+        {
+            glDisable(GL_CULL_FACE);
+            glCullFace(GL_BACK);
+        }
+        
         shader_use_program(shader);
         glBindVertexArray(vao);
-        
+        shader_set_bool(shader, "fake_light", fake_light); 
         shader_set_material(shader, "material", material);
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, gs->game_textures[material.texture_index].id);
@@ -43,6 +52,8 @@ void renderer_render(Renderer* renderer, GameState* gs)
             Mesh mesh = gs->game_meshes[ren->mesh_index];
             glDrawElements(GL_TRIANGLES, mesh.indices_count, GL_UNSIGNED_INT, 0);
         }
+        glEnable(GL_CULL_FACE);
+        glCullFace(GL_BACK);
 
     }
     

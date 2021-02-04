@@ -20,6 +20,9 @@ struct Renderable
     v3 scale = {1.0f, 1.0f, 1.0f}; //if scale init to 0 the object will not have size
     v3 rotate;
     m4 model;
+    
+    bool has_alpha = false;
+    bool fake_light = false;
 };
 
 Renderable renderable_create(MeshIndex mesh_index, MaterialIndex material_index);

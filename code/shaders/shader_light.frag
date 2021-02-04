@@ -14,6 +14,7 @@ struct Material {
     float shininess;
 };
 uniform Material material;
+uniform bool fake_light;
 
 struct DirLight {
 
@@ -44,7 +45,17 @@ vec3 calc_point_light(PointLight light, vec3 normal, vec3 frag_pos, vec3 view_di
 
 void main()
 {
+    
+    vec4 texture_color = texture(material.diffuse, tex_coords);
+    if(texture_color.a < 0.5)
+    {
+        discard;
+    }
     vec3 norm = normalize(normals);
+    if(fake_light)
+    {
+        norm = vec3(0.0, 1.0, 0.0);
+    }
     vec3 view_dir = normalize(view_pos - frag_pos);
     //Directional light
     vec3 result = calc_dir_light(dir_light, norm, view_dir);

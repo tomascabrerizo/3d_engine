@@ -3,7 +3,7 @@
 
 #include "mesh.h"
 
-#define TERRAIN_SIZE 800
+#define TERRAIN_SIZE 400
 #define TERRAIN_VERTEX_COUNT 128 
 #define TERRAIN_INDICES_COUNT (6 * (TERRAIN_VERTEX_COUNT - 1))
 

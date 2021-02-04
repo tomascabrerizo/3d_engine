@@ -28,7 +28,7 @@ Texture texture_create(const char* path)
         dy--;
     }
 
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, image->w, image->h, 0, GL_BGRA, GL_UNSIGNED_BYTE, (char*)flip_img);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, image->w, image->h, 0, GL_BGRA, GL_UNSIGNED_BYTE, (char*)flip_img);
     glGenerateMipmap(GL_TEXTURE_2D);
     free(flip_img);
     SDL_FreeSurface(image);

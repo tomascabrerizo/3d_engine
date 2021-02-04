@@ -82,6 +82,8 @@ SDL_Window* initialize_platform(GameState* game_state)
     SDL_SetRelativeMouseMode(SDL_TRUE);
     printf("OpenGL version: (%s)\n", glGetString(GL_VERSION));
     glPolygonMode(GL_FRONT_AND_BACK, GL_TRIANGLES);
+    glEnable(GL_CULL_FACE);
+    glCullFace(GL_BACK);
     
     return window; 
 }
@@ -103,18 +105,20 @@ void game_init(GameState* game_state)
     //Init textures
     game_state->game_textures[TEXTURE_TERRAIN] = texture_create("./res/grass.bmp");
     game_state->game_textures[TEXTURE_TREE] = texture_create("./res/models/tree/tree.bmp");
-    game_state->game_textures[TEXTURE_BACKPACK_DIFUSE] = texture_create("./res/models/backpack/diffuse.bmp");
-    game_state->game_textures[TEXTURE_BACKPACK_SPECULAR] = texture_create("./res/models/backpack/specular.bmp");
+    game_state->game_textures[TEXTURE_GRASS] = texture_create("./res/models/grass/grass.bmp");
+    game_state->game_textures[TEXTURE_FERN] = texture_create("./res/models/grass/fern.bmp");
   
     //Init materials 
-    game_state->game_materials[MATERIAL_BACKPACK] = material_create(TEXTURE_BACKPACK_DIFUSE, TEXTURE_BACKPACK_SPECULAR, 32);
     game_state->game_materials[MATERIAL_TERRAIN] = material_create(TEXTURE_TERRAIN, TEXTURE_EMPTY, 32);
     game_state->game_materials[MATERIAL_TREE] = material_create(TEXTURE_TREE, TEXTURE_EMPTY, 32);
+    game_state->game_materials[MATERIAL_GRASS] = material_create(TEXTURE_GRASS, TEXTURE_EMPTY, 32);
+    game_state->game_materials[MATERIAL_FERN] = material_create(TEXTURE_FERN, TEXTURE_EMPTY, 32);
     
     //Init Meshes
     game_state->game_meshes[MESH_TREE] = mesh_load_from_obj("./res/models/tree/tree.obj", game_state);
-    game_state->game_meshes[MESH_BACKPACK] = mesh_load_from_obj("./res/models/backpack/backpack.obj", game_state);
     game_state->game_meshes[MESH_TERRAIN] = terrain_generate();
+    game_state->game_meshes[MESH_GRASS] = mesh_load_from_obj("./res/models/grass/grass.obj", game_state);
+    game_state->game_meshes[MESH_FERN] = mesh_load_from_obj("./res/models/grass/fern.obj", game_state);
 
     //Init renderable
     //NOTE(tomi):Set static seed
@@ -126,22 +130,45 @@ void game_init(GameState* game_state)
         float rand_z = (float)rand_int(-TERRAIN_SIZE/2, TERRAIN_SIZE/2);
         game_state->ren_tree[i].pos = new_v3(rand_x, 0, rand_z);
     }
+    for(uint32_t i = 0; i < GRASS_COUNT; ++i)
+    {
+        game_state->ren_grass[i] = renderable_create(MESH_GRASS, MATERIAL_GRASS); 
+        float rand_x = (float)rand_int(-TERRAIN_SIZE/2, TERRAIN_SIZE/2);
+        float rand_z = (float)rand_int(-TERRAIN_SIZE/2, TERRAIN_SIZE/2);
+        game_state->ren_grass[i].pos = new_v3(rand_x, 0, rand_z);
+        game_state->ren_grass[i].scale = new_v3(.4, .4, .4);
+        game_state->ren_grass[i].has_alpha = true;
+        game_state->ren_grass[i].fake_light = true;
+    }
+    for(uint32_t i = 0; i < FERN_COUNT; ++i)
+    {
+        game_state->ren_fern[i] = renderable_create(MESH_FERN, MATERIAL_FERN); 
+        float rand_x = (float)rand_int(-TERRAIN_SIZE/2, TERRAIN_SIZE/2);
+        float rand_z = (float)rand_int(-TERRAIN_SIZE/2, TERRAIN_SIZE/2);
+        game_state->ren_fern[i].pos = new_v3(rand_x, 0, rand_z);
+        game_state->ren_fern[i].scale = new_v3(.2, .2, .2);
+        game_state->ren_fern[i].has_alpha = true;
+        game_state->ren_fern[i].fake_light = true;
+    }
     game_state->ren_terrain = renderable_create(MESH_TERRAIN, MATERIAL_TERRAIN); 
     game_state->ren_terrain.pos = new_v3(0, 0, 0);
     
     //TODO(tomi):Take out game_state from this fucntion 
+    //Init Renderer queue
     renderer_add(&game_state->renderer, game_state->ren_tree, TREE_COUNT, SHADER_TEXTURE, game_state);
     renderer_add(&game_state->renderer, &game_state->ren_terrain, 1, SHADER_TEXTURE, game_state);
+    renderer_add(&game_state->renderer, game_state->ren_grass, GRASS_COUNT, SHADER_TEXTURE, game_state);
+    renderer_add(&game_state->renderer, game_state->ren_fern, FERN_COUNT, SHADER_TEXTURE, game_state);
 
     //Init camera
-    game_state->camera.speed = 10;
+    game_state->camera.speed = 5;
     game_state->camera.sensibility = 0.5f;
     
     //Init Lights
     game_state->light_backpack.direction = new_v3(0.0f, -0.6f, -0.4f);
     game_state->light_backpack.ambient = new_v3(0.1f, 0.1f, 0.1f);
-    game_state->light_backpack.diffuse = new_v3(0.7f, 0.7f, 0.7f);
-    game_state->light_backpack.specular = new_v3(0.9f, 0.9f, 0.9f);
+    game_state->light_backpack.diffuse = new_v3(0.8f, 0.6f, 0.0f);
+    game_state->light_backpack.specular = new_v3(0.9f, 0.3f, 0.0f);
     
     //TODO(tomi):Maybe create a function to init all shaders 
     //Init Shaders 
@@ -200,7 +227,7 @@ void game_update(GameState* game_state, float dt)
 
 void game_render(GameState* game_state)
 {
-    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+    glClearColor(0.0f, 0.0f, 0.06f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     
     renderer_render(&game_state->renderer, game_state);

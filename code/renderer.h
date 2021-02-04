@@ -13,6 +13,8 @@ struct RenderableInfo
     uint32_t vao;
     uint32_t shader;
     uint32_t count;
+    bool has_alpha = false;
+    bool fake_light = false;
 };
 
 struct Renderer 
