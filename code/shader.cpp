@@ -48,6 +48,8 @@ uint32_t shader_create_program(const char* vert_path, const char* frag_path)
 
     glDeleteShader(vertex_shader);
     glDeleteShader(fragment_shader); 
+    
+    printf("SHADER: VERTEX(%s) FRAGMENT(%s) Loaded\n", vert_path, frag_path);
 
     return shader_program;
 }

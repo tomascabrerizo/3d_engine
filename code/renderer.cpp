@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include <GL/glew.h>
 #include <assert.h>
 #include "game_state.h"
@@ -15,6 +16,24 @@ void renderer_add(Renderer* renderer, Renderable* ren, uint32_t ren_count, uint3
     renderer->render_queue[index].vao = gs->game_meshes[ren->mesh_index].vao;
     renderer->render_queue[index].has_alpha = ren[0].has_alpha;
     renderer->render_queue[index].fake_light = ren[0].fake_light;
+    renderer->render_queue[index].is_terrain = false;
+    renderer->index++; 
+}
+
+
+void renderer_add(Renderer* renderer, Terrain* terrain, uint32_t terrain_count, uint32_t shader, GameState* gs)
+{
+    assert(renderer->index < MAX_MESHES_COUNT);
+    Renderable* ren = &terrain->ren;
+    uint32_t index =  renderer->index;
+    renderer->render_queue[index].renderable = ren; 
+    renderer->render_queue[index].shader = gs->shaders[shader]; 
+    renderer->render_queue[index].count = terrain_count;
+    renderer->render_queue[index].vao = gs->game_meshes[ren->mesh_index].vao;
+    renderer->render_queue[index].has_alpha = ren[0].has_alpha;
+    renderer->render_queue[index].fake_light = ren[0].fake_light;
+    renderer->render_queue[index].is_terrain = true;
+    renderer->render_queue[index].multi_texture = terrain->multi_texture;
     renderer->index++; 
 }
 
@@ -28,6 +47,7 @@ void renderer_render(Renderer* renderer, GameState* gs)
         Material material = gs->game_materials[material_index];
         bool has_alpha = renderer->render_queue[i].has_alpha;
         bool fake_light = renderer->render_queue[i].fake_light;
+        bool is_terrain = renderer->render_queue[i].is_terrain;
         if(has_alpha)
         {
             glDisable(GL_CULL_FACE);
@@ -42,6 +62,20 @@ void renderer_render(Renderer* renderer, GameState* gs)
         glBindTexture(GL_TEXTURE_2D, gs->game_textures[material.texture_index].id);
         glActiveTexture(GL_TEXTURE1);
         glBindTexture(GL_TEXTURE_2D, gs->game_textures[material.texture_specular_index].id);
+
+        //TODO(tomi)Maybe try to use functions pointer to diferents renderables types
+        if(is_terrain)
+        {
+            MultiTexture mt = renderer->render_queue[i].multi_texture;
+            glActiveTexture(GL_TEXTURE2);
+            glBindTexture(GL_TEXTURE_2D, gs->game_textures[mt.r_texture].id);
+            glActiveTexture(GL_TEXTURE3);
+            glBindTexture(GL_TEXTURE_2D, gs->game_textures[mt.g_texture].id);
+            glActiveTexture(GL_TEXTURE4);
+            glBindTexture(GL_TEXTURE_2D, gs->game_textures[mt.b_texture].id);
+            glActiveTexture(GL_TEXTURE5);
+            glBindTexture(GL_TEXTURE_2D, gs->game_textures[mt.blend_texture].id);
+        }
 
         for(uint32_t j = 0; j < renderer->render_queue[i].count; ++j)
         {

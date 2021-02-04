@@ -1,9 +1,9 @@
 #ifndef DEFINES_H
 #define DEFINES_H
 
-#define TREE_COUNT 4096 
-#define GRASS_COUNT 2048 
-#define FERN_COUNT 2048 
+#define TREE_COUNT 1024 
+#define GRASS_COUNT 512 
+#define FERN_COUNT 512 
 
 #define MAX_TEXTURE_COUT 32
 #define MAX_MATERIAL_COUNT 32
@@ -32,8 +32,13 @@ enum MeshIndex {
 //NOTE(tomi):Game textures
 enum TextureIndex {
     TEXTURE_EMPTY = 0,
+    TEXTURE_SPECULAR,
     TEXTURE_TREE,
     TEXTURE_TERRAIN,
+    TEXTURE_BLEND_MAP,
+    TEXTURE_FLOWER,
+    TEXTURE_MUD,
+    TEXTURE_PATH,
     TEXTURE_GRASS,
     TEXTURE_FERN,
 

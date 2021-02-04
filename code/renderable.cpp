@@ -8,6 +8,7 @@
 Renderable renderable_create(MeshIndex mesh_index, MaterialIndex material_index)
 {
     Renderable res = {};
+    res.scale = {1.0f, 1.0f, 1.0f};
     res.mesh_index = mesh_index;
     res.material_index = material_index;
     return res;

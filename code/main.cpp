@@ -92,8 +92,10 @@ SDL_Window* initialize_platform(GameState* game_state)
 
 void game_init(GameState* game_state)
 {
-    *game_state = {};
+    //*game_state = {};
+    game_state->running = true;
     game_state->window = initialize_platform(game_state);
+    game_state->sky_color = new_v3(0.5, 0.5, 0.5);
     //Important Asserts
     assert(SHADER_COUNT < MAX_SHADERS_COUNT);
     assert(MESH_COUNT < MAX_MESHES_COUNT);
@@ -103,25 +105,35 @@ void game_init(GameState* game_state)
     //Create Shaders
     game_state->shaders[SHADER_TEXTURE] = shader_create_program("./shaders/shader.vert", "./shaders/shader_light.frag");
     game_state->shaders[SHADER_COLOR] = shader_create_program("./shaders/shader.vert", "./shaders/shader_color.frag");
-    game_state->shaders[SHADER_TERRAIN] = shader_create_program("./shaders/shader.vert", "./shaders/shader_color.frag");
+    game_state->shaders[SHADER_TERRAIN] = shader_create_program("./shaders/shader_terrain.vert", "./shaders/shader_terrain.frag");
 
     //Init textures
     game_state->game_textures[TEXTURE_TERRAIN] = texture_create("./res/grass.bmp");
+    game_state->game_textures[TEXTURE_SPECULAR] = texture_create("./res/specular.bmp");
+    game_state->game_textures[TEXTURE_FLOWER] = texture_create("./res/terrain/grass_flowers.bmp");
+    game_state->game_textures[TEXTURE_MUD] = texture_create("./res/terrain/mud.bmp");
+    game_state->game_textures[TEXTURE_PATH] = texture_create("./res/terrain/path.bmp");
+    game_state->game_textures[TEXTURE_BLEND_MAP] = texture_create("./res/terrain/blend_map.bmp");
     game_state->game_textures[TEXTURE_TREE] = texture_create("./res/models/tree/tree.bmp");
     game_state->game_textures[TEXTURE_GRASS] = texture_create("./res/models/grass/grass.bmp");
     game_state->game_textures[TEXTURE_FERN] = texture_create("./res/models/grass/fern.bmp");
   
     //Init materials 
-    game_state->game_materials[MATERIAL_TERRAIN] = material_create(TEXTURE_TERRAIN, TEXTURE_EMPTY, 32);
-    game_state->game_materials[MATERIAL_TREE] = material_create(TEXTURE_TREE, TEXTURE_EMPTY, 32);
-    game_state->game_materials[MATERIAL_GRASS] = material_create(TEXTURE_GRASS, TEXTURE_EMPTY, 32);
-    game_state->game_materials[MATERIAL_FERN] = material_create(TEXTURE_FERN, TEXTURE_EMPTY, 32);
+    game_state->game_materials[MATERIAL_TERRAIN] = material_create(TEXTURE_TERRAIN, TEXTURE_SPECULAR, 32);
+    game_state->game_materials[MATERIAL_TREE] = material_create(TEXTURE_TREE, TEXTURE_SPECULAR, 32);
+    game_state->game_materials[MATERIAL_GRASS] = material_create(TEXTURE_GRASS, TEXTURE_SPECULAR, 32);
+    game_state->game_materials[MATERIAL_FERN] = material_create(TEXTURE_FERN, TEXTURE_SPECULAR, 32);
     
     //Init Meshes
     game_state->game_meshes[MESH_TREE] = mesh_load_from_obj("./res/models/tree/tree.obj", game_state);
-    game_state->game_meshes[MESH_TERRAIN] = terrain_generate();
     game_state->game_meshes[MESH_GRASS] = mesh_load_from_obj("./res/models/grass/grass.obj", game_state);
     game_state->game_meshes[MESH_FERN] = mesh_load_from_obj("./res/models/grass/fern.obj", game_state);
+    game_state->game_meshes[MESH_TERRAIN] = terrain_generate();
+    
+    //Init MultiTexture
+    MultiTexture terrain_texture = {TEXTURE_MUD, TEXTURE_FLOWER, TEXTURE_PATH, TEXTURE_BLEND_MAP};
+    //Init Terrain
+    game_state->terrain = terrain_create(MESH_TERRAIN, MATERIAL_TERRAIN, terrain_texture);
 
     //Init renderable
     //NOTE(tomi):Set static seed
@@ -132,6 +144,7 @@ void game_init(GameState* game_state)
         float rand_x = (float)rand_int(-TERRAIN_SIZE/2, TERRAIN_SIZE/2);
         float rand_z = (float)rand_int(-TERRAIN_SIZE/2, TERRAIN_SIZE/2);
         game_state->ren_tree[i].pos = new_v3(rand_x, 0, rand_z);
+        game_state->ren_tree[i].scale = new_v3(4, 4, 4);
     }
     for(uint32_t i = 0; i < GRASS_COUNT; ++i)
     {
@@ -139,7 +152,7 @@ void game_init(GameState* game_state)
         float rand_x = (float)rand_int(-TERRAIN_SIZE/2, TERRAIN_SIZE/2);
         float rand_z = (float)rand_int(-TERRAIN_SIZE/2, TERRAIN_SIZE/2);
         game_state->ren_grass[i].pos = new_v3(rand_x, 0, rand_z);
-        game_state->ren_grass[i].scale = new_v3(.4, .4, .4);
+        game_state->ren_grass[i].scale = new_v3(1, 1, 1);
         game_state->ren_grass[i].has_alpha = true;
         game_state->ren_grass[i].fake_light = true;
     }
@@ -149,7 +162,7 @@ void game_init(GameState* game_state)
         float rand_x = (float)rand_int(-TERRAIN_SIZE/2, TERRAIN_SIZE/2);
         float rand_z = (float)rand_int(-TERRAIN_SIZE/2, TERRAIN_SIZE/2);
         game_state->ren_fern[i].pos = new_v3(rand_x, 0, rand_z);
-        game_state->ren_fern[i].scale = new_v3(.2, .2, .2);
+        game_state->ren_fern[i].scale = new_v3(.5, .5, .5);
         game_state->ren_fern[i].has_alpha = true;
         game_state->ren_fern[i].fake_light = true;
     }
@@ -159,30 +172,49 @@ void game_init(GameState* game_state)
     //TODO(tomi):Take out game_state from this fucntion 
     //Init Renderer queue
     renderer_add(&game_state->renderer, game_state->ren_tree, TREE_COUNT, SHADER_TEXTURE, game_state);
-    renderer_add(&game_state->renderer, &game_state->ren_terrain, 1, SHADER_TEXTURE, game_state);
+    renderer_add(&game_state->renderer, &game_state->ren_terrain, 1, SHADER_TERRAIN, game_state);
     renderer_add(&game_state->renderer, game_state->ren_grass, GRASS_COUNT, SHADER_TEXTURE, game_state);
     renderer_add(&game_state->renderer, game_state->ren_fern, FERN_COUNT, SHADER_TEXTURE, game_state);
+    renderer_add(&game_state->renderer, &game_state->terrain, 1, SHADER_TERRAIN, game_state);
 
     //Init camera
-    game_state->camera.speed = 5;
+    game_state->camera = {};
+    game_state->camera.speed = 15;
     game_state->camera.sensibility = 0.5f;
     
     //Init Lights
-    game_state->light_backpack.direction = new_v3(0.0f, -0.6f, -0.4f);
-    game_state->light_backpack.ambient = new_v3(0.1f, 0.1f, 0.1f);
-    game_state->light_backpack.diffuse = new_v3(0.8f, 0.6f, 0.0f);
-    game_state->light_backpack.specular = new_v3(0.9f, 0.3f, 0.0f);
+    game_state->light.direction = new_v3(0.0f, -0.6f, -0.4f);
+    game_state->light.ambient = new_v3(0.1f, 0.1f, 0.02f);
+    game_state->light.diffuse = new_v3(0.5f, 0.5f, 0.1f);
+    game_state->light.specular = new_v3(0.6f, 0.1f, 0.0f);
+    
+    game_state->light_terrain.direction = new_v3(0.0f, -0.6f, -0.4f);
+    game_state->light_terrain.ambient = new_v3(0.1f, 0.1f, 0.1f);
+    game_state->light_terrain.diffuse = new_v3(0.5f, 0.5f, 0.5f);
+    game_state->light_terrain.specular = new_v3(0.0f, 0.0f, 0.0f);
     
     //TODO(tomi):Maybe create a function to init all shaders 
     //Init Shaders 
+    shader_use_program(game_state->shaders[SHADER_TEXTURE]);
     shader_set_int(game_state->shaders[SHADER_TEXTURE], "material.diffuse", 0);
     shader_set_int(game_state->shaders[SHADER_TEXTURE], "material.specular", 1);
-    m4 p = perspective(60.0f, (float)WINDOW_WIDTH/(float)WINDOW_HEIGHT, 0.1f, 100.0f);
+    shader_set_dir_light(game_state->shaders[SHADER_TEXTURE], "dir_light", game_state->light);
+    
+    shader_use_program(game_state->shaders[SHADER_TERRAIN]);
+    shader_set_int(game_state->shaders[SHADER_TERRAIN], "material.diffuse", 0);
+    shader_set_int(game_state->shaders[SHADER_TERRAIN], "material.specular", 1);
+    shader_set_int(game_state->shaders[SHADER_TERRAIN], "r_texture", 2);
+    shader_set_int(game_state->shaders[SHADER_TERRAIN], "g_texture", 3);
+    shader_set_int(game_state->shaders[SHADER_TERRAIN], "b_texture", 4);
+    shader_set_int(game_state->shaders[SHADER_TERRAIN], "blend_texture", 5);
+    shader_set_dir_light(game_state->shaders[SHADER_TERRAIN], "dir_light", game_state->light_terrain);
+    
+    m4 p = perspective(60.0f, (float)WINDOW_WIDTH/(float)WINDOW_HEIGHT, 0.1f, 1000.0f);
     for(int i = 0; i < SHADER_COUNT; ++i)
     { 
         shader_use_program(game_state->shaders[i]);
         shader_set_m4(game_state->shaders[i], "projection", p);
-        shader_set_dir_light(game_state->shaders[i], "dir_light", game_state->light_backpack);
+        shader_set_v3(game_state->shaders[i], "sky_color", game_state->sky_color);
     }
 }
 
@@ -230,7 +262,7 @@ void game_update(GameState* game_state, float dt)
 
 void game_render(GameState* game_state)
 {
-    glClearColor(0.0f, 0.0f, 0.06f, 1.0f);
+    glClearColor(game_state->sky_color.x, game_state->sky_color.y, game_state->sky_color.z, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     
     renderer_render(&game_state->renderer, game_state);

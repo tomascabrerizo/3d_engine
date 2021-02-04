@@ -209,6 +209,6 @@ Mesh mesh_load_from_obj(const char* path, GameState* gs)
     //free(new_mesh.vertices);
     //free(new_mesh.indices);
 
-    printf("FILE:'%s' loaded!\n", path);
+    printf("MESH: %s Loaded!\n", path);
     return new_mesh;
 }

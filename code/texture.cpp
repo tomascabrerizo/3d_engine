@@ -12,6 +12,7 @@ Texture texture_create(const char* path)
     glGenTextures(1, &new_texture.id);
     glBindTexture(GL_TEXTURE_2D, new_texture.id);
     SDL_Surface* image = SDL_LoadBMP(path);
+    assert(image);
     assert(image->format->BytesPerPixel == 4);
     new_texture.w = image->w; 
     new_texture.h = image->h; 

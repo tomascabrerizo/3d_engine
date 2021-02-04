@@ -11,6 +11,7 @@
 #include "defines.h"
 #include "renderable.h"
 #include "renderer.h"
+#include "terrain.h"
 
 const int WINDOW_WIDTH = 1280;
 const int WINDOW_HEIGHT = 720;
@@ -28,13 +29,18 @@ struct GameState {
     float mouse_offset_y = 0;
     Camera camera;
 
+    v3 sky_color;
+
     uint32_t shaders[MAX_SHADERS_COUNT];
     Texture game_textures[MAX_TEXTURE_COUT];
     Material game_materials[MAX_MATERIAL_COUNT];
     Mesh game_meshes[MAX_MESHES_COUNT];
 
-    DirLight light_backpack;
+    DirLight light_terrain;
+    DirLight light;
     
+    Terrain terrain;
+
     Renderable ren_tree[TREE_COUNT];
     Renderable ren_terrain;
     Renderable ren_grass[GRASS_COUNT];
