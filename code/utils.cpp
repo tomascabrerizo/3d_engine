@@ -138,3 +138,20 @@ int rand_int(int min, int max)
     int r = rand()%shift;
     return min + r; 
 }
+
+bitmap bitmap_load(const char* path)
+{
+    bitmap image = {};
+    image.sdl_surface = SDL_LoadBMP(path);
+    image.pixels = image.sdl_surface->pixels;
+    image.width = image.sdl_surface->w;
+    image.height= image.sdl_surface->h;
+    image.bytes_per_pixel = image.sdl_surface->format->BytesPerPixel;
+    return image; 
+}
+
+void bitmap_free(bitmap* image)
+{
+    SDL_FreeSurface(image->sdl_surface);
+    image->pixels = 0;
+}

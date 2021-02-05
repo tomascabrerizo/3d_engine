@@ -1,10 +1,21 @@
 #ifndef UTILS_H
 #define UTILS_H
+#include <SDL2/SDL.h>
 #include <stdint.h>
 
 #define array_count(x) (sizeof(x)/sizeof(x[0]))
 
 struct GameState;
+
+struct bitmap {
+    void* pixels;
+    uint32_t width;
+    uint32_t height;
+    uint32_t bytes_per_pixel;
+
+    //NOTE(tomi): SDL2 especific
+    SDL_Surface* sdl_surface;
+};
 
 struct file_info
 {
@@ -37,5 +48,8 @@ char* concat_string(const char* s0, const char* s1, char* s);
 
 //NOTE(tomi):IMPORTANT srand() must be initiallized
 int rand_int(int main, int max);
+
+bitmap bitmap_load(const char* path);
+void bitmap_free(bitmap* image);
 
 #endif

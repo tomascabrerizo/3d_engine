@@ -2,7 +2,7 @@
 #define DEFINES_H
 
 #define TREE_COUNT 1024 
-#define GRASS_COUNT 512 
+#define GRASS_COUNT 256 
 #define FERN_COUNT 512 
 
 #define MAX_TEXTURE_COUT 32

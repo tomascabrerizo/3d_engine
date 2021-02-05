@@ -113,22 +113,23 @@ void game_init(GameState* game_state)
     game_state->game_textures[TEXTURE_FLOWER] = texture_create("./res/terrain/grass_flowers.bmp");
     game_state->game_textures[TEXTURE_MUD] = texture_create("./res/terrain/mud.bmp");
     game_state->game_textures[TEXTURE_PATH] = texture_create("./res/terrain/path.bmp");
-    game_state->game_textures[TEXTURE_BLEND_MAP] = texture_create("./res/terrain/blend_map.bmp");
+    game_state->game_textures[TEXTURE_BLEND_MAP] = texture_create("./res/terrain/blend_map_tomi.bmp");
     game_state->game_textures[TEXTURE_TREE] = texture_create("./res/models/tree/tree.bmp");
     game_state->game_textures[TEXTURE_GRASS] = texture_create("./res/models/grass/grass.bmp");
     game_state->game_textures[TEXTURE_FERN] = texture_create("./res/models/grass/fern.bmp");
   
     //Init materials 
     game_state->game_materials[MATERIAL_TERRAIN] = material_create(TEXTURE_TERRAIN, TEXTURE_SPECULAR, 32);
-    game_state->game_materials[MATERIAL_TREE] = material_create(TEXTURE_TREE, TEXTURE_SPECULAR, 32);
-    game_state->game_materials[MATERIAL_GRASS] = material_create(TEXTURE_GRASS, TEXTURE_SPECULAR, 32);
-    game_state->game_materials[MATERIAL_FERN] = material_create(TEXTURE_FERN, TEXTURE_SPECULAR, 32);
+    game_state->game_materials[MATERIAL_TREE] = material_create(TEXTURE_TREE, TEXTURE_SPECULAR, 8);
+    game_state->game_materials[MATERIAL_GRASS] = material_create(TEXTURE_GRASS, TEXTURE_EMPTY, 8);
+    game_state->game_materials[MATERIAL_FERN] = material_create(TEXTURE_FERN, TEXTURE_EMPTY, 8);
     
     //Init Meshes
     game_state->game_meshes[MESH_TREE] = mesh_load_from_obj("./res/models/tree/tree.obj", game_state);
     game_state->game_meshes[MESH_GRASS] = mesh_load_from_obj("./res/models/grass/grass.obj", game_state);
     game_state->game_meshes[MESH_FERN] = mesh_load_from_obj("./res/models/grass/fern.obj", game_state);
-    game_state->game_meshes[MESH_TERRAIN] = terrain_generate();
+    bitmap terrain_bitmap = bitmap_load("./res/terrain/heightmap.bmp");
+    game_state->game_meshes[MESH_TERRAIN] = terrain_generate(terrain_bitmap);
     
     //Init MultiTexture
     MultiTexture terrain_texture = {TEXTURE_MUD, TEXTURE_FLOWER, TEXTURE_PATH, TEXTURE_BLEND_MAP};
@@ -143,7 +144,9 @@ void game_init(GameState* game_state)
         game_state->ren_tree[i] = renderable_create(MESH_TREE, MATERIAL_TREE); 
         float rand_x = (float)rand_int(-TERRAIN_SIZE/2, TERRAIN_SIZE/2);
         float rand_z = (float)rand_int(-TERRAIN_SIZE/2, TERRAIN_SIZE/2);
-        game_state->ren_tree[i].pos = new_v3(rand_x, 0, rand_z);
+        float bitmap_x = ((float)(rand_x + TERRAIN_SIZE/2) / (float)(TERRAIN_SIZE-1)) * (float)terrain_bitmap.height; 
+        float bitmap_z = ((float)(rand_z + TERRAIN_SIZE/2) / (float)(TERRAIN_SIZE-1)) * (float)terrain_bitmap.height; 
+        game_state->ren_tree[i].pos = new_v3(rand_x, get_height_form_map(bitmap_x, bitmap_z, terrain_bitmap), rand_z);
         game_state->ren_tree[i].scale = new_v3(4, 4, 4);
     }
     for(uint32_t i = 0; i < GRASS_COUNT; ++i)
@@ -151,7 +154,9 @@ void game_init(GameState* game_state)
         game_state->ren_grass[i] = renderable_create(MESH_GRASS, MATERIAL_GRASS); 
         float rand_x = (float)rand_int(-TERRAIN_SIZE/2, TERRAIN_SIZE/2);
         float rand_z = (float)rand_int(-TERRAIN_SIZE/2, TERRAIN_SIZE/2);
-        game_state->ren_grass[i].pos = new_v3(rand_x, 0, rand_z);
+        float bitmap_x = ((float)(rand_x + TERRAIN_SIZE/2) / (float)(TERRAIN_SIZE-1)) * (float)terrain_bitmap.height; 
+        float bitmap_z = ((float)(rand_z + TERRAIN_SIZE/2) / (float)(TERRAIN_SIZE-1)) * (float)terrain_bitmap.height; 
+        game_state->ren_grass[i].pos = new_v3(rand_x, get_height_form_map(bitmap_x, bitmap_z, terrain_bitmap), rand_z);
         game_state->ren_grass[i].scale = new_v3(1, 1, 1);
         game_state->ren_grass[i].has_alpha = true;
         game_state->ren_grass[i].fake_light = true;
@@ -161,7 +166,9 @@ void game_init(GameState* game_state)
         game_state->ren_fern[i] = renderable_create(MESH_FERN, MATERIAL_FERN); 
         float rand_x = (float)rand_int(-TERRAIN_SIZE/2, TERRAIN_SIZE/2);
         float rand_z = (float)rand_int(-TERRAIN_SIZE/2, TERRAIN_SIZE/2);
-        game_state->ren_fern[i].pos = new_v3(rand_x, 0, rand_z);
+        float bitmap_x = ((float)(rand_x + TERRAIN_SIZE/2) / (float)(TERRAIN_SIZE-1)) * (float)terrain_bitmap.height; 
+        float bitmap_z = ((float)(rand_z + TERRAIN_SIZE/2) / (float)(TERRAIN_SIZE-1)) * (float)terrain_bitmap.height; 
+        game_state->ren_fern[i].pos = new_v3(rand_x, get_height_form_map(bitmap_x, bitmap_z, terrain_bitmap), rand_z);
         game_state->ren_fern[i].scale = new_v3(.5, .5, .5);
         game_state->ren_fern[i].has_alpha = true;
         game_state->ren_fern[i].fake_light = true;
