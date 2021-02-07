@@ -113,7 +113,7 @@ void game_init(GameState* game_state)
     game_state->game_textures[TEXTURE_FLOWER] = texture_create("./res/terrain/grass_flowers.bmp");
     game_state->game_textures[TEXTURE_MUD] = texture_create("./res/terrain/mud.bmp");
     game_state->game_textures[TEXTURE_PATH] = texture_create("./res/terrain/path.bmp");
-    game_state->game_textures[TEXTURE_BLEND_MAP] = texture_create("./res/terrain/blend_map_tomi.bmp");
+    game_state->game_textures[TEXTURE_BLEND_MAP] = texture_create("./res/terrain/blend_map.bmp");
     game_state->game_textures[TEXTURE_TREE] = texture_create("./res/models/tree/tree.bmp");
     game_state->game_textures[TEXTURE_GRASS] = texture_create("./res/models/grass/grass.bmp");
     game_state->game_textures[TEXTURE_FERN] = texture_create("./res/models/grass/fern.bmp");
@@ -128,6 +128,7 @@ void game_init(GameState* game_state)
     game_state->game_meshes[MESH_TREE] = mesh_load_from_obj("./res/models/tree/tree.obj", game_state);
     game_state->game_meshes[MESH_GRASS] = mesh_load_from_obj("./res/models/grass/grass.obj", game_state);
     game_state->game_meshes[MESH_FERN] = mesh_load_from_obj("./res/models/grass/fern.obj", game_state);
+    
     bitmap terrain_bitmap = bitmap_load("./res/terrain/heightmap.bmp");
     game_state->game_meshes[MESH_TERRAIN] = terrain_generate(terrain_bitmap);
     
@@ -173,6 +174,7 @@ void game_init(GameState* game_state)
         game_state->ren_fern[i].has_alpha = true;
         game_state->ren_fern[i].fake_light = true;
     }
+    bitmap_free(&terrain_bitmap);
     game_state->ren_terrain = renderable_create(MESH_TERRAIN, MATERIAL_TERRAIN); 
     game_state->ren_terrain.pos = new_v3(0, 0, 0);
     
@@ -190,14 +192,14 @@ void game_init(GameState* game_state)
     game_state->camera.sensibility = 0.5f;
     
     //Init Lights
-    game_state->light.direction = new_v3(0.0f, -0.6f, -0.4f);
+    game_state->light.direction = new_v3(0.0f, -0.5f, -1.0f);
     game_state->light.ambient = new_v3(0.1f, 0.1f, 0.02f);
     game_state->light.diffuse = new_v3(0.5f, 0.5f, 0.1f);
     game_state->light.specular = new_v3(0.6f, 0.1f, 0.0f);
     
-    game_state->light_terrain.direction = new_v3(0.0f, -0.6f, -0.4f);
+    game_state->light_terrain.direction = new_v3(0.0f, -0.5f, -1.0f);
     game_state->light_terrain.ambient = new_v3(0.1f, 0.1f, 0.1f);
-    game_state->light_terrain.diffuse = new_v3(0.5f, 0.5f, 0.5f);
+    game_state->light_terrain.diffuse = new_v3(0.7f, 0.7f, 0.7f);
     game_state->light_terrain.specular = new_v3(0.0f, 0.0f, 0.0f);
     
     //TODO(tomi):Maybe create a function to init all shaders 
@@ -290,6 +292,9 @@ int main(int argc, char* argv[])
     {
         process_input(game_state);
         
+        //printf("camera:{x:%f, y:%f, z:%f\n}",
+        //       game_state->camera.pos.x, game_state->camera.pos.y, game_state->camera.pos.z);
+
         game_update(game_state, dt);
         game_render(game_state);
         

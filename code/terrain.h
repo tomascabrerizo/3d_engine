@@ -10,7 +10,7 @@
 #define TERRAIN_VERTEX_COUNT 128 
 #define TERRAIN_INDICES_COUNT (6 * (TERRAIN_VERTEX_COUNT - 1))
 #define MAP_MAX_COLOR (256*256*256)
-#define MAP_MAX_TOP 40
+#define MAP_MAX_TOP 60
 #define MAP_MAX_BOTTOM -50
 
 struct MultiTexture

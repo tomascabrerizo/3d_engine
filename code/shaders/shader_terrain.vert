@@ -13,8 +13,8 @@ out vec3 normals;
 out vec3 frag_pos;
 out float visibility;
 
-const float density = 0.006;
-const float gradient = 3.0;
+const float density = 0.004;
+const float gradient = 5.0;
 
 void main()
 {
